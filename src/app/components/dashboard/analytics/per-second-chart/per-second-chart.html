@@ -1,0 +1,55 @@
+<div class="chart-wrapper">
+    <div id="emotion-timeline" class="h-[50%] w-full absolute bottom-0"></div>
+
+    @if(videoUrl && showScenes) {
+    <div class="overlay">
+        @for (scene of salientScenesData; track $index) {
+        <div class="scene-marker pointer-events-auto" [style.left.px]="getPixelPosition(scene.time).x"
+            [style.bottom.px]="getPixelPosition(scene.time).y" [class.active]="hoveredIndex === $index"
+            (mouseenter)="playScene($event, scene.time, $index)" (mouseleave)="stopScene($event)">
+            <div class="bubble"
+                [ngStyle]="{background: scene.positive == 1 ? ' rgba(0, 255, 0, 0.25)' : 'rgba(255, 0, 0, 0.25)'}">
+                <video [src]="videoUrl" playsinline class="clip" [muted]="true"
+                    (loadedmetadata)="onVideoLoad($event, scene.time)"></video>
+                <div class="absolute top-2 right-2 text-white">({{ scene.time }}s)</div>
+                <div class="absolute top-2 left-2 text-lg  emoji">
+                    {{ getEmotionEmoji(scene) }}
+                </div>
+                <div class="bg-white mt-1 rounded-sm p-1">
+                    <div class="flex items-center justify-between cursor-pointer" (click)="expandScene.set(!expandScene())">
+                        <p>Discreption</p>
+                        @if(expandScene()){
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up-icon lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>
+                        }
+                        @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                        }
+                    </div>
+                    @if(expandScene() && (hoveredIndex === $index)){
+                        <p class="text-xxs text-left">{{ sceneSummaries[scene.time] || 'Loading...' }}</p>
+                    }
+                </div>
+            </div>
+            <!-- @if(!(expandScene() && (hoveredIndex === $index))){ -->
+            <div class="w-full flex justify-center">
+                <div class="border border-1 border-dashed border-white opacity-[0.4] h-60 w-[1px]"></div>
+            </div>
+            <!-- } -->
+        </div>
+        }
+    </div>
+    }@else {
+
+    <div class="overlay">
+        @for (scene of salientScenesData; track $index) {
+        <div class="scene-marker pointer-events-auto" [style.left.px]="getPixelPosition(scene.time).x"
+            [style.bottom.px]="40">
+            <div class="h-4 w-4 rounded-full"
+                [ngStyle]="{background: scene.positive == 1 ? ' rgba(0, 255, 0, 0.7)' : 'rgba(255, 0, 0, 0.7)'}">
+            </div>
+        </div>
+        }
+    </div>
+    }
+
+</div>

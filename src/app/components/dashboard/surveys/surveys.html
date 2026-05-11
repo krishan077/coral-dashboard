@@ -1,0 +1,90 @@
+@if(rawData() && (totalStudies > 0)){
+<div class="mb-6">
+    <h1 class="text-xl text-gray-900 mb-1">Dashboard</h1>
+    <p class="text-gray-600 text-xs">Manage and monitor your studies</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <div class="flex items-center justify-between mb-1"><span class="text-xs text-gray-600">Total
+                Studies</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-chart-column w-3.5 h-3.5 text-gray-400">
+                <path d="M3 3v16a2 2 0 0 0 2 2h16"></path>
+                <path d="M18 17V9"></path>
+                <path d="M13 17V5"></path>
+                <path d="M8 17v-3"></path>
+            </svg></div>
+        <div class="text-xl text-gray-900">{{totalStudies}}</div>
+        <p class="text-[10px] text-gray-500 mt-1">{{this.rawData().complete.length || 0}} completed</p>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <div class="flex items-center justify-between mb-1"><span class="text-xs text-gray-600">Active
+                Studies</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-flask-conical w-3.5 h-3.5 text-gray-400">
+                <path
+                    d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2">
+                </path>
+                <path d="M6.453 15h11.094"></path>
+                <path d="M8.5 2h7"></path>
+            </svg></div>
+        <div class="text-xl text-gray-900">{{activeStudies}}</div>
+        <p class="text-[10px] text-gray-500 mt-1">{{this.rawData().draft.length || 0}} in draft</p>
+    </div>
+</div>
+
+<div class="flex gap-6 items-center mb-6 bg-white rounded-lg border border-gray-200 p-4">
+    @for(tab of tabs; track tab){
+        <h4 class="capitalise p-1 text-gray-600 border border-2 border-transparent cursor-pointer hover:text-gray-800" (click)="setTab(tab)" [class.active]="selectedTab() === tab">{{tab}} ({{ tabCounts()[tab] }})</h4>
+    }
+</div>
+
+<div class="mb-6">
+    @if(filteredStudies().length > 0){
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+       @for (study of filteredStudies(); track study.study_id) {
+        <div (click)="viewResult(study)"
+            class="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-900 transition-colors cursor-pointer">
+            <div class="flex items-center gap-2 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" class="lucide lucide-circle-check w-4 h-4 text-green-600">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="m9 12 2 2 4-4"></path>
+                </svg>
+                <span class="text-[10px] text-green-700">{{tabs[study.status + 1]}}</span></div>
+            <h3 class="text-sm text-gray-900 mb-1">{{study.study_name}}</h3>
+            <!-- <p class="text-xs text-gray-500 mb-3">1,602 participants</p> -->
+            <button class="text-xs text-gray-900 hover:text-gray-700 flex items-center gap-1">
+                View Results<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-arrow-right w-3.5 h-3.5">
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                </svg>
+            </button>
+        </div>
+        }
+    </div>
+    }@else {
+        <div class="flex items-center gap-2 my-1 bg-white rounded-lg border border-gray-200 p-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
+                        <path
+                            d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+                        <path d="M12 15h.01" />
+                        <path d="M12 7v4" />
+                    </svg>
+                    <p class="text-sm">No survey found</p>
+                </div>
+    }
+
+</div>
+}
+@else {
+    <div class="w-full h-screen flex items-center justify-center">
+        <app-loader></app-loader>
+    </div>
+}

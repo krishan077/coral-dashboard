@@ -1,0 +1,141 @@
+@if(filteredData()){
+<div class="bg-white border-b border-neutral-200">
+    <div class="px-8 py-6">
+        <div class="flex items-center gap-4 mb-4 cursor-pointer" routerLink="/dashboard">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-move-left-icon lucide-move-left">
+                <path d="M6 8L2 12L6 16" />
+                <path d="M2 12H22" />
+            </svg>
+            <p>Back</p>
+        </div>
+        <h1 class="text-2xl font-semibold text-neutral-900">Emotion Survey Dashboard</h1>
+        <p class="text-sm text-neutral-600 mt-1">{{study_name}}</p>
+    </div>
+</div>
+<div class="bg-white border-b border-neutral-200">
+    <div class="px-8">
+        <div class="flex gap-1">
+            @for(exposure of exposures; track exposure) {
+            <button class="px-6 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer"
+                [ngClass]="selectedExposure() === $index ? 'border-blue-700 text-blue-700' : 'border-transparent text-neutral-600 hover:text-neutral-900 hover:border-neutral-300'"
+                (click)="getSelectedExposure($index)">
+                <div class="flex items-center gap-2">
+                    @if($index === 0) {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-play w-4 h-4">
+                        <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                    </svg>
+                    }
+                    @else if($index == 1) {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-eye w-4 h-4">
+                        <path
+                            d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
+                        </path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    }
+                    @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-chart-line-icon lucide-chart-line w-4 h-4">
+                        <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+                        <path d="m19 9-5 5-4-4-3 3" />
+                    </svg>
+                    }
+                    <span>{{ exposure }}</span>
+                </div>
+            </button>
+            }
+        </div>
+    </div>
+</div>
+
+@if(selectedExposure() != 0){
+<div class="bg-white border-b border-neutral-200">
+    <div class="px-8 py-4 flex items-center gap-6">
+        @if(selectedExposure() === 2) {
+        <div class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded text-sm"><svg
+                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-eye w-4 h-4 text-blue-600">
+                <path
+                    d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
+                </path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg><span class="font-medium text-blue-900">Client Ad - Forced Complete View</span></div>
+        }
+        <div class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" class="lucide lucide-funnel w-4 h-4 text-neutral-500">
+                <path
+                    d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z">
+                </path>
+            </svg>
+            <span class="text-sm font-medium text-neutral-700">Ad:</span>
+            <select class="px-3 py-1.5 border border-neutral-300 rounded text-sm bg-white"
+                (change)="getSelectedAd($event)">
+                @for(ad of ads(); track ad) {
+                <option [value]="$index">{{ad.title}}</option>
+                }
+            </select>
+        </div>
+        <div class="flex items-center gap-2"><span class="text-sm font-medium text-neutral-700">Group:</span>
+            <select class="px-3 py-1.5 border border-neutral-300 rounded text-sm bg-white"
+                (change)="getSelectedGroup($event)">
+                @for(group of groups(); track group){
+                <option [value]="group.slag">{{group.group}}</option>
+                }
+            </select>
+        </div>
+        <div class="flex items-center gap-2"><span class="text-sm font-medium text-neutral-700">Participants:</span>
+            <select class="px-3 py-1.5 border border-neutral-300 rounded text-sm bg-white"
+                (change)="getSelectedParticipant($event)">
+                @for(participant of participants(); track participant){
+                <option [value]="$index">
+                    {{participant.user_name ? participant.user_name : participant.wh_mo_id }}
+                </option>
+                }
+            </select>
+        </div>
+        <div class="ml-auto flex items-center gap-2 text-sm text-neutral-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-users w-4 h-4">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg><span>{{ totalParticipants() }} participants</span>
+        </div>
+    </div>
+</div>
+}
+
+<div class="w-full overflow-hidden">
+    @if(this.filteredData()) {
+    @if(selectedExposure() === 1) {
+    <app-exposure-1 [data]="this.filteredData().emotionTimelineFirstExposure"
+        [groupPerformanceFirstData]="groupPerformanceFirstData" [selectedParticipant]="selectedParticipant()"
+        [performanceData]="PerformanceData()" [videoUrl]="selectedAd()?.video_URL"
+        [cnt_id]="selectedAd()?.cnt_id"></app-exposure-1>
+    }
+    @else if(selectedExposure() === 2) {
+        <app-exposure-2 [data]="this.filteredData().emotionTimelineForcedExposure"
+        [groupPerformanceForceData]="groupPerformanceForceData" [selectedParticipant]="selectedParticipant()"
+        [videoUrl]="selectedAd()?.video_URL" [cnt_id]="selectedAd()?.cnt_id" [selectedGroup]="selectedGroup()"></app-exposure-2>
+    }@else {
+        <app-executive [ads]="response.data"></app-executive>
+    }
+}
+</div>
+}
+@else {
+<div class="w-full h-screen flex items-center justify-center">
+    <app-loader></app-loader>
+</div>
+}

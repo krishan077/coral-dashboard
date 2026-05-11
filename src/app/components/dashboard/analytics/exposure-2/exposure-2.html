@@ -1,0 +1,162 @@
+<div class="px-8 py-6 space-y-6">
+    <h2 class="text-lg font-semibold text-neutral-900 mb-4">{{data?.title}}</h2>
+    <div class="grid grid-cols-4 gap-4">
+        @for(stat of topStats(); track stat){
+        <div class="bg-white border border-neutral-200 p-5">
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-sm text-neutral-600">{{stat.title}}</span>
+            </div>
+            <div class="text-3xl font-semibold text-neutral-900">{{ stat.value}}
+            </div>
+        </div>
+        }
+    </div>
+
+    <div class="bg-white border border-neutral-200 p-6">
+        <div class="flex items-center justify-between">
+            <div class="mb-4 flex items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-neutral-900">Summary
+                    </h2>
+                    <p>{{ selectedParticipant.user_name ? selectedParticipant.user_name : selectedParticipant.wh_mo_id}}
+                    </p>
+                </div>
+                @if(!summaryData()){
+                    <app-loader></app-loader>
+                }
+                
+            </div>
+        </div>
+        @if(summaryData()){
+        <markdown [data]="summaryData()"></markdown>
+        }
+    </div>
+
+
+    <div class="bg-white border border-neutral-200 p-6">
+        <div class="flex items-center justify-between">
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold text-neutral-900">{{data?.title}} - Forced Viewing with FACS
+                    Tracking
+                </h2>
+                @if(selectedParticipant.wh_mo_id == 'All'){
+                <div class="flex items-center gap-2 my-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
+                        <path
+                            d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+                        <path d="M12 15h.01" />
+                        <path d="M12 7v4" />
+                    </svg>
+                    <p class="text-xs">User video is visible only in the participant view</p>
+                </div>
+                }
+            </div>
+            <button class="mb-2 px-3 py-1 text-sm bg-gray-200 rounded cursor-pointer" (click)="toggleScenes()">
+                {{ showScenes ? 'Hide Scenes' : 'Show Scenes' }}
+            </button>
+        </div>
+        <div class="relative">
+            <div class="w-full flex gap-2">
+                @if(selectedParticipant.wh_mo_id != "All"){
+                <div class="w-[29%]">
+                    <div class="bg-black rounded-xl">
+                        <div class="relative video-container" style="width: 100%; height: 480px; min-width: 0px;">
+                            <video #userVideo class="w-full rounded-xl h-full object-contain" muted
+                                [src]="selectedParticipant.video_URL">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                }
+                <div [ngClass]="selectedParticipant.wh_mo_id == 'All' ? 'w-full' : 'w-[70%]' ">
+                    <div class="bg-black rounded-xl">
+                        <div class="relative video-container" style="width: 100%; height: 480px; min-width: 0px;">
+                            <video #videoRef class="w-full rounded-xl h-full object-contain " [src]="videoUrl"
+                                (loadedmetadata)="onVideoLoaded(videoRef)" (timeupdate)="onTimeUpdate()">
+                            </video>
+                            <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+                                <app-per-second-chart [data]="data" [showScenes]="showScenes" [videoUrl]="videoUrl"
+                                    [cnt_id]="cnt_id" [seriesConfig]="seriesConfig" [video]="videoRef"
+                                    [selectedParticipant]="selectedParticipant">
+                                </app-per-second-chart>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="flex flex-wrap gap-3  justify-center mt-2">
+                        @for(s of seriesConfig; track s) {
+                        <div class="flex items-center gap-2 cursor-pointer transition" [class.opacity-100]="s.visible"
+                            [class.opacity-40]="!s.visible" (click)="toggleSeries($index)">
+                            <span class="w-3 h-3 rounded-full" [style.background]="s.color"></span>
+                            <span class="text-xs text-black opacity-80">
+                                {{ s.name }}
+                            </span>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <input class="w-full mt-2" type="range" [value]="progress()" (input)="seek($event)">
+            <div class="flex items-center justify-center gap-2">
+                <button class="p-2 rounded-full bg-violet-500 cursor-pointer hover:bg-violet-400"
+                    (click)="togglePlay()">
+                    @if(!isPlaying){
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide text-white lucide-circle-play-icon lucide-circle-play">
+                        <path
+                            d="M9 9.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997A1 1 0 0 1 9 14.996z" />
+                        <circle cx="12" cy="12" r="10" />
+                    </svg>
+                    }
+                    @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide text-white lucide-circle-pause-icon lucide-circle-pause">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="10" x2="10" y1="15" y2="9" />
+                        <line x1="14" x2="14" y1="15" y2="9" />
+                    </svg>
+                    }
+                </button>
+                <button class="p-1 rounded-full bg-violet-500 cursor-pointer hover:bg-violet-400"
+                    (click)="toggleMute()">
+                    @if(!isMuted){
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide text-white lucide-volume2-icon lucide-volume-2">
+                        <path
+                            d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+                        <path d="M16 9a5 5 0 0 1 0 6" />
+                        <path d="M19.364 18.364a9 9 0 0 0 0-12.728" />
+                    </svg>
+                    }
+                    @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide text-white lucide-volume-off-icon lucide-volume-off">
+                        <path d="M16 9a5 5 0 0 1 .95 2.293" />
+                        <path d="M19.364 5.636a9 9 0 0 1 1.889 9.96" />
+                        <path d="m2 2 20 20" />
+                        <path
+                            d="m7 7-.587.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298V11" />
+                        <path d="M9.828 4.172A.686.686 0 0 1 11 4.657v.686" />
+                    </svg>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-6">
+        <div class="bg-white border border-neutral-200 p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 mb-4">Average Emotion Distribution</h2>
+            <app-average-emotion-distribution [data]="data?.overall.perSecond"></app-average-emotion-distribution>
+        </div>
+        <div class="bg-white border border-neutral-200 p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 mb-4">Group Performance</h2>
+            <app-group-perfromance-barchart
+                [groupPerformanceFirstData]="groupPerformanceForceData"></app-group-perfromance-barchart>
+        </div>
+    </div>

@@ -1,0 +1,244 @@
+<div class="bg-white border border-neutral-200 p-5 mt-8">
+
+    <h2 class="text-md font-semibold mb-4">
+        Viewer Retentions
+    </h2>
+
+    <div class="w-full">
+        <app-viewer-retention [data]="ads"></app-viewer-retention>
+    </div>
+
+</div>
+
+<div class="mt-8">
+
+    @if (ads) {
+
+    @for (ad of ads; track ad; let i = $index) {
+
+    <div class="bg-white border border-neutral-200 p-5 mb-6 rounded-lg">
+
+        <h2 class="text-md font-semibold mb-4">
+            {{ ad.title }}
+        </h2>
+
+        <div class="w-full flex gap-4">
+
+            <!-- VIDEO SECTION -->
+            <div class="w-[40%] border border-gray-200 rounded-lg p-3">
+
+                <!-- VIDEO CONTAINER -->
+                <div class="relative bg-black rounded-lg overflow-hidden">
+
+                    <!-- VIDEO -->
+                    <video #mainVideo [src]="ad.video_URL" class="w-full h-[360px] object-contain" preload="metadata"
+                        (timeupdate)="onVideoTimeUpdate($event, i)" (loadedmetadata)="onVideoLoaded(mainVideo, i)"
+                        (ended)="ad.isPlaying = false">
+                    </video>
+                    <!-- CHART -->
+                    <div [id]="'emotion-chart-' + i"
+                        class="absolute top-0 left-0 w-full h-full z-20 pointer-events-none"  [style.visibility]="ad.showGraph ? 'visible' : 'hidden'">
+                    </div>
+
+                    <!-- PLAYHEAD -->
+                    <div class="absolute top-[18%] h-[220px] w-[2px] bg-red-500 z-30"
+                        [style.left.%]="ad.playheadPosition" [style.visibility]="ad.showGraph ? 'visible' : 'hidden'">
+                    </div>
+
+                    <!-- CENTER PLAY -->
+                    @if (!ad.isPlaying) {
+
+                    <div class="absolute inset-0 flex items-center justify-center z-40">
+
+                        <button
+                            class="bg-white/20 backdrop-blur-md text-white rounded-full w-16 h-16 text-2xl hover:bg-white/30 transition-all"
+                            (click)="toggleVideo(mainVideo, ad)">
+
+                            ▶
+
+                        </button>
+
+                    </div>
+
+                    }
+
+                </div>
+
+                <!-- CUSTOM CONTROLS -->
+                <div class="mt-4">
+
+                    <!-- SEEK -->
+                    <input type="range" min="0" [max]="ad.duration || 0" step="0.1" [value]="ad.currentTime || 0"
+                        (input)="seekVideo($event, mainVideo, ad)" class="w-full cursor-pointer accent-black">
+
+                    <!-- CONTROL BAR -->
+                    <div class="flex items-center justify-between mt-3">
+
+                        <div class="flex items-center gap-3">
+
+                            <!-- PLAY / PAUSE -->
+                            <button class="px-4 py-1.5 rounded-md bg-black text-white text-sm cursor-pointer"
+                                (click)="toggleVideo(mainVideo, ad)">
+
+                                {{ ad.isPlaying ? 'Pause' : 'Play' }}
+
+                            </button>
+
+                            <!-- TIME -->
+                            <span class="text-xs text-gray-600">
+
+                                {{ formatTime(ad.currentTime) }}
+                                /
+                                {{ formatTime(ad.duration) }}
+
+                            </span>
+
+                        </div>
+
+                        <!-- TOGGLE GRAPH -->
+                        <div class="flex items-center justify-between gap-2">
+
+                            <span class="text-sm font-medium text-neutral-700">
+                                Emotion Graph
+                            </span>
+
+                            <button
+                                class="relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-300"
+                                [class.bg-green-500]="ad.showGraph" [class.bg-gray-300]="!ad.showGraph"
+                                (click)="toggleGraph(ad, i)">
+
+                                <span
+                                    class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300"
+                                    [class.translate-x-6]="ad.showGraph" [class.translate-x-1]="!ad.showGraph">
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                        <!-- SPEED -->
+                        <select class="border border-gray-300 rounded-md px-2 py-1 text-sm"
+                            (change)="changePlaybackSpeed($event, mainVideo)">
+
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- CUSTOM LEGENDS -->
+                    <div class="flex flex-wrap gap-2 mt-4" [style.visibility]="ad.showGraph ? 'visible' : 'hidden'">
+
+                        @for (legend of emotionLegends; track legend.name) {
+
+                        <button class="px-3 py-1 rounded-full border text-xs transition-all"
+                            [class.opacity-40]="!legend.visible" [style.borderColor]="legend.color"
+                            [style.color]="legend.color" (click)="toggleSeries(i, legend.name)">
+
+                            <span class="inline-block w-2 h-2 rounded-full mr-1" [style.background]="legend.color">
+                            </span>
+
+                            {{ legend.name }}
+
+                        </button>
+
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- SCENES -->
+            <div class="w-[60%] p-4 border border-gray-200 rounded-lg grid grid-cols-1 gap-4">
+
+                <!-- TOP SCENES -->
+                <div>
+
+                    <h2 class="text-sm font-semibold text-neutral-900 mb-3">
+                        Top scenes
+                    </h2>
+
+                    <div class="grid grid-cols-3 gap-4">
+
+                        @for (
+                        scene of ad.groups
+                        .filter(item => item.group == 'Overall')[0]
+                        .emotionTimelineFirstExposure.salientScenes;
+                        track scene
+                        ) {
+
+                        @if (scene.positive) {
+
+                        <div class="bg-black rounded-md overflow-hidden cursor-pointer border-4 border-green-400 relative"
+                            (mouseenter)="playScene($event, scene.time, mainVideo, ad)"
+                            (mouseleave)="stopScene($event, mainVideo, ad)">
+
+                            <video [src]="ad.video_URL" class="w-full h-full object-contain" muted preload="metadata"
+                                (loadedmetadata)="setThumbnail($event, scene.time)">
+                            </video>
+
+                            <p class="absolute text-white right-2 top-2 text-left text-xs bg-gray-500 rounded-lg p-1 backdrop-blur-md" style="z-index: 9999;">{{((+scene.time) - 3 < 0 ? 0 : (+scene.time) - 3 )+'s' + '-' + ((+scene.time + 3))+'s'}}</p>
+
+                        </div>
+
+                        }
+
+                        }
+
+                    </div>
+
+                </div>
+
+                <!-- BOTTOM SCENES -->
+                <div>
+
+                    <h2 class="text-sm font-semibold text-neutral-900 mb-3">
+                        Bottom scenes
+                    </h2>
+
+                    <div class="grid grid-cols-3 gap-4">
+
+                        @for (
+                        scene of ad.groups
+                        .filter(item => item.group == 'Overall')[0]
+                        .emotionTimelineFirstExposure.salientScenes;
+                        track scene
+                        ) {
+
+                        @if (!scene.positive) {
+
+                        <div class="bg-black rounded-md overflow-hidden cursor-pointer border-4 border-red-400 relative"
+                            (mouseenter)="playScene($event, scene.time, mainVideo, ad)"
+                            (mouseleave)="stopScene($event, mainVideo, ad)">
+
+                            <video [src]="ad.video_URL" class="w-full h-full object-contain" muted preload="metadata"
+                                (loadedmetadata)="setThumbnail($event, scene.time)">
+                            </video>
+                             <p class="absolute text-white right-2 top-2 text-left text-xs bg-gray-500 rounded-lg p-1 backdrop-blur-md" style="z-index: 9999;">{{((+scene.time) - 3 < 0 ? 0 : (+scene.time) - 3 )+'s' + '-' + ((+scene.time + 3))+'s'}}</p>
+
+                        </div>
+
+                        }
+
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    }
+
+    }
+
+</div>

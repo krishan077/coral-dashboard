@@ -1,0 +1,141 @@
+<div id="container">
+    <div class="tailwind css-uwf2km css-exq74d">
+        <div class="flex h-screen bg-gray-50">
+            @if(collapsed()){
+                <div class="bg-white p-4 border-r border-gray-200 flex flex-col">
+                    <div class="py-4 cursor-pointer" (click)="collapsed.set(false)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+                    </div>
+                </div>
+            }@else {
+            <div class="w-56 bg-white border-r border-gray-200 flex flex-col">
+                <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                    <a class="block active">
+                        <img src="monet-logo.png" alt="Monet RCT" class="h-7 w-auto"></a>
+                        <div class="bg-white flex flex-col p-4 cursor-pointer" (click)="collapsed.set(true)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left-icon lucide-chevron-left"><path d="m15 18-6-6 6-6"/></svg>
+                </div>
+                </div>
+                <!-- <div class="p-3 border-b border-gray-100">
+                    <button
+                        class="w-full cursor-pointer px-3 py-2 bg-gray-900 text-white text-xs rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-start gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-plus w-3.5 h-3.5">
+                            <path d="M5 12h14"></path>
+                            <path d="M12 5v14"></path>
+                        </svg>
+                        <span>New Study</span>
+                    </button>
+                </div> -->
+                <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+                    <a
+                        class="w-full cursor-pointer flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors text-xs bg-gray-100 text-gray-900">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-layout-dashboard w-4 h-4">
+                            <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                            <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                            <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                            <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+                </nav>
+
+                <div class="p-3 border-t border-gray-100 space-y-0.5">
+                    <a
+                        class="w-full cursor-pointer flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors text-xs text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-settings w-4 h-4">
+                            <path
+                                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
+                            </path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+                    <a
+                        class="w-full cursor-pointer flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors text-xs text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-circle-help w-4 h-4">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <path d="M12 17h.01"></path>
+                        </svg>
+                        <span>Help Center</span>
+                    </a>
+                </div>
+                <div class="p-3 border-t border-gray-100">
+                    <button (click)="showUserMenu.set(!showUserMenu())"
+                        class="w-full cursor-pointer flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-gray-50 transition-colors">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200" alt="Sarah Chen"
+                            class="w-6 h-6 rounded-full object-cover">
+                        <div class="flex-1 text-left min-w-0">
+                            <div class="text-xs text-gray-900 truncate">User</div>
+                            <div class="text-[10px] text-gray-500 capitalize">pro</div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-chevron-down w-3 h-3 text-gray-400 transition-transform">
+                            <path d="m6 9 6 6 6-6"></path>
+                        </svg>
+                    </button>
+                    @if(showUserMenu()){
+                    <div class="mt-2 py-1 bg-white border border-gray-200 rounded-lg shadow-lg" bis_skin_checked="1">
+                        <!-- <button
+                            class="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            fdprocessedid="80gz29"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-trending-up w-3 h-3">
+                                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                                <polyline points="16 7 22 7 22 13"></polyline>
+                            </svg>Upgrade Plan</button> -->
+                        <!-- <button
+                            class="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            fdprocessedid="ujg6ak"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell w-3 h-3">
+                                <path d="M10.268 21a2 2 0 0 0 3.464 0"></path>
+                                <path
+                                    d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326">
+                                </path>
+                            </svg>Notifications</button> -->
+                        <!-- <button
+                            class="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            fdprocessedid="o7d6mb"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-3 h-3">
+                                <path
+                                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
+                                </path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>Account Settings</button>
+                        <hr class="my-1"> -->
+                        <button (click)="logout()"
+                            class="w-full px-3 py-1.5 text-left text-xs text-red-600 hover:bg-red-50 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-log-out w-3 h-3">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" x2="9" y1="12" y2="12"></line>
+                            </svg>Sign Out</button>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+            <main class="flex-1 overflow-auto">
+                <div class="min-h-screen bg-gray-50">
+                    <div class=" p-8">
+                        <router-outlet></router-outlet>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>

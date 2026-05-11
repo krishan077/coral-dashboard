@@ -1,0 +1,114 @@
+<div class="px-8 py-6 space-y-6">
+    <h2 class="text-lg font-semibold text-neutral-900 mb-4">{{data?.title}}</h2>
+    <div class="grid grid-cols-4 gap-4">
+        @if(this.selectedParticipant.wh_mo_id == "All"){
+        @for (stat of topStats(); track stat.title) {
+        <div class="bg-white border border-neutral-200 p-5">
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-sm text-neutral-600">{{stat.title}}</span>
+                @if($index === 0) {
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-trending-up w-4 h-4 text-blue-600">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                    <polyline points="16 7 22 7 22 13"></polyline>
+                </svg>
+                }
+                @else if($index === 1){
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-play w-4 h-4 text-green-600">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                </svg>
+                }
+                @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-skip-forward w-4 h-4 text-orange-600">
+                    <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                    <line x1="19" x2="19" y1="5" y2="19"></line>
+                </svg>
+                }
+            </div>
+            <div class="text-3xl font-semibold text-neutral-900">{{stat.value + ($index == 3 ? 's': $index == 0 ? '':  '%')}}</div>
+            <div class="text-xs text-neutral-500 mt-1">{{stat.description}}</div>
+        </div>
+        }
+        } @else(){
+             @for (stat of topStatsPerParticipant(); track stat.title) {
+        <div class="bg-white border border-neutral-200 p-5">
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-sm text-neutral-600">{{stat.title}}</span>
+                @if($index === 0) {
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-trending-up w-4 h-4 text-blue-600">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                    <polyline points="16 7 22 7 22 13"></polyline>
+                </svg>
+                }
+                @else if($index === 1){
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-play w-4 h-4 text-green-600">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                </svg>
+                }
+                @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-skip-forward w-4 h-4 text-orange-600">
+                    <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                    <line x1="19" x2="19" y1="5" y2="19"></line>
+                </svg>
+                }
+            </div>
+            <div class="text-3xl font-semibold text-neutral-900">{{stat.value + ($index == 3 ? 's':'')}}</div>
+            <div class="text-xs text-neutral-500 mt-1">{{stat.description}}</div>
+        </div>
+        }
+        }
+
+</div>
+        <!-- <div class="bg-white border border-neutral-200 p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 mb-4">Viewer Retention</h2>
+       <app-viewer-retention [data]="data.viewRetention"></app-viewer-retention>
+    </div> -->
+
+    <div class="bg-white border border-neutral-200 p-6">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-neutral-900 mb-4">FACS Emotion Timeline</h2>
+            @if(this.selectedParticipant.wh_mo_id == "All"){
+            <button class="mb-2 px-3 py-1 text-sm bg-gray-200 rounded cursor-pointer" (click)="toggleScenes()">
+                {{ showScenes() ? 'Hide Scenes' : 'Show Scenes' }}
+            </button>
+            }@else {
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
+                    <path
+                        d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+                    <path d="M12 15h.01" />
+                    <path d="M12 7v4" />
+                </svg>
+                <p class="text-xs">Salient scenes are visible only in the overall view</p>
+            </div>
+            }
+        </div>
+        <app-emotion-timeline [showScenes]="showScenes()" [data]="data" [selectedParticipant]="selectedParticipant"
+            [videoUrl]="videoUrl" [cnt_id]="cnt_id"></app-emotion-timeline>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <div class="bg-white border border-neutral-200 p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 mb-4">Ad Performance Comparison</h2>
+            <app-ad-perfromance-barchart [performanceData]="performanceData"></app-ad-perfromance-barchart>
+        </div>
+        <div class="bg-white border border-neutral-200 p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 mb-4">Group Performance</h2>
+            <app-group-perfromance-barchart [groupPerformanceFirstData]="groupPerformanceFirstData" ></app-group-perfromance-barchart>
+        </div>
+    </div>
+    
+</div>

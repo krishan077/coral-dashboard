@@ -1,0 +1,62 @@
+.chart-wrapper {
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* allows chart interaction */
+}
+
+.scene-marker {
+  position: absolute;
+  transform: translateX(-50%);
+  transition: transform 0.2s ease, z-index 0.2s;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.scene-marker.active {
+  z-index: 999;              /* bring to front */
+  transform: translateX(-50%) scale(1.15);
+}
+
+.bubble {
+  background: rgba(0,0,0,0.5);
+  padding: 6px;
+  border-radius: 8px;
+  width: 200px;
+  font-size: 11px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  position: relative;
+}
+
+.clip {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.emoji {
+  font-size: 18px;
+  transform: scale(1);
+  transition: transform 0.2s ease;
+}
+
+.scene-marker.active .emoji {
+  animation: emojiPulse 1s infinite ease-in-out;
+}
+
+@keyframes emojiPulse {
+  0%, 100% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1.35);
+  }
+}
