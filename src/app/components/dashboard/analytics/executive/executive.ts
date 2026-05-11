@@ -3,6 +3,7 @@ import {
   Component,
   Input,
   OnChanges,
+  signal,
   SimpleChanges
 } from '@angular/core';
 
@@ -40,6 +41,8 @@ export class Executive implements OnChanges, AfterViewInit {
     { name: 'Arousal', color: '#f97316', visible: false },
     { name: 'Engagement', color: '#e11d48', visible: false }
   ];
+
+  downloadingScenes = signal<Record<string, boolean>>({});
 
   ngAfterViewInit(): void {
     this.initCharts();
@@ -454,5 +457,134 @@ export class Executive implements OnChanges, AfterViewInit {
     }
 
   });
+}
+
+isSceneDownloading(key: string): boolean {
+  return this.downloadingScenes()[key] || false;
+}
+
+setSceneDownloading(
+  key: string,
+  value: boolean
+) {
+
+  this.downloadingScenes.update(current => ({
+    ...current,
+    [key]: value
+  }));
+}
+
+async downloadScene(
+  videoUrl: string,
+  sceneTime: number,
+  title: string,
+  sceneKey: string
+) {
+  this.setSceneDownloading(sceneKey, true);
+  const start = Math.max(sceneTime - 3, 0);
+
+  const end = sceneTime + 3;
+
+  // CREATE VIDEO
+  const video = document.createElement('video');
+
+  video.src = videoUrl;
+
+  video.crossOrigin = 'anonymous';
+
+  video.muted = true;
+
+  await video.play().catch(() => { });
+
+  video.pause();
+
+  // WAIT FOR METADATA
+  await new Promise<void>((resolve) => {
+
+    if (video.readyState >= 1) {
+      resolve();
+    } else {
+      video.onloadedmetadata = () => resolve();
+    }
+
+  });
+
+  // CREATE CANVAS
+  const canvas = document.createElement('canvas');
+
+  canvas.width = video.videoWidth;
+
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) return;
+
+  // RECORD STREAM
+  const stream = canvas.captureStream(30);
+
+  const recorder = new MediaRecorder(stream, {
+    mimeType: 'video/webm'
+  });
+
+  const chunks: Blob[] = [];
+
+  recorder.ondataavailable = (e) => {
+
+    if (e.data.size > 0) {
+      chunks.push(e.data);
+    }
+
+  };
+
+  recorder.start();
+
+  // SEEK TO START
+  video.currentTime = start;
+
+  await new Promise(resolve => {
+
+    video.onseeked = () => resolve(true);
+
+  });
+
+  video.play();
+
+  // DRAW LOOP
+  const render = () => {
+
+    if (video.currentTime >= end || video.paused || video.ended) {
+
+      recorder.stop();
+
+      video.pause();
+
+      return;
+    }
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    requestAnimationFrame(render);
+
+  };
+
+  render();
+
+  // DOWNLOAD FILE
+  recorder.onstop = () => {
+
+    const blob = new Blob(chunks, {
+      type: 'video/webm'
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download =
+      `${title.replace(/\s+/g, '_')}_${start}s-${end}s.webm`;
+    a.click();
+    URL.revokeObjectURL(url);
+    this.setSceneDownloading(sceneKey, false);
+  };
 }
 }
