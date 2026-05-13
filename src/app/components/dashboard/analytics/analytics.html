@@ -1,4 +1,4 @@
-@if(filteredData()){
+@if(!loading()) {
 <div class="bg-white border-b border-neutral-200">
     <div class="px-8 py-6">
         <div class="flex items-center gap-4 mb-4 cursor-pointer" routerLink="/dashboard">
@@ -117,21 +117,58 @@
 }
 
 <div class="w-full overflow-hidden">
-    @if(this.filteredData()) {
+    <!-- @if(this.filteredData()) { -->
     @if(selectedExposure() === 1) {
-    <app-exposure-1 [data]="this.filteredData().emotionTimelineFirstExposure"
+        @if(response() && response().data[0].groups.length > 0){
+                <app-exposure-1 [data]="this.filteredData().emotionTimelineFirstExposure"
         [groupPerformanceFirstData]="groupPerformanceFirstData" [selectedParticipant]="selectedParticipant()"
         [performanceData]="PerformanceData()" [videoUrl]="selectedAd()?.video_URL"
         [cnt_id]="selectedAd()?.cnt_id"></app-exposure-1>
+        }@else {
+            <div class="bg-white border-b border-neutral-200 mt-8">
+    <div class="px-8 py-4 flex items-center gap-6">
+                                                <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
+                    <path
+                        d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+                    <path d="M12 15h.01" />
+                    <path d="M12 7v4" />
+                </svg>
+                <p class="text-xs">Report will be available when at least one participant has completed the exposure</p>
+            </div>
+            </div>
+            </div>
+        }
     }
     @else if(selectedExposure() === 2) {
+        @if(response() && response().data[0].groups.length > 0){
         <app-exposure-2 [data]="this.filteredData().emotionTimelineForcedExposure"
         [groupPerformanceForceData]="groupPerformanceForceData" [selectedParticipant]="selectedParticipant()"
         [videoUrl]="selectedAd()?.video_URL" [cnt_id]="selectedAd()?.cnt_id" [selectedGroup]="selectedGroup()"></app-exposure-2>
-    }@else {
-        <app-executive [ads]="response.data"></app-executive>
-    }
-}
+        }@else{
+            <div class="bg-white border-b border-neutral-200 mt-8">
+    <div class="px-8 py-4 flex items-center gap-6">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
+                    <path
+                        d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+                    <path d="M12 15h.01" />
+                    <path d="M12 7v4" />
+                </svg>
+                <p class="text-xs">Report will be available when at least one participant has completed the exposure</p>
+            </div>
+            </div>
+            </div>
+        }
+    }@else if(selectedExposure() === 0 && response() && response().data.length > 0){
+            <app-executive [ads]="response().data"></app-executive>
+        }
+    
+<!-- } -->
 </div>
 }
 @else {

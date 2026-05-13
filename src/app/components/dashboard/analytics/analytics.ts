@@ -32,9 +32,10 @@ export class Analytics {
   groupPerformanceForceData = signal<any>([]);
   filteredData = signal<any>(null);
 
-  response: any;
+  response= signal<any>(null);
   study_id: any;
   study_name: any;
+  loading = signal(true);
 
   constructor(private route: ActivatedRoute, private _api: Api) {
     this.route.queryParamMap.subscribe((data: any) => {
@@ -52,7 +53,7 @@ export class Analytics {
   getSelectedExposure(index: number) {
     this.selectedExposure.set(index);
 
-    const allAds = this.response.data;
+    const allAds = this.response().data;
 
     const filteredAds = index === 2 ? allAds.filter((ad: any) => ad.type === 'tgt') : allAds
 
@@ -70,28 +71,28 @@ export class Analytics {
     this.setAd(ad);
 
     let perfGroupData = []
-    
-    perfGroupData =  this.selectedAd().groups.filter((item: any)=> item.group != 'Overall').map((group: any)=>{
-      console.log(group);
-      
-        return {
-          title:  this.selectedAd().title,
-          engagement: group.emotionTimelineFirstExposure.overall.emotion.engagement,
-          completion: group.emotionTimelineFirstExposure.completion
-        };
-      });
-      console.log(perfGroupData);
-      this.groupPerformanceFirstData.set(perfGroupData);
 
-      let perfGroupDataForce = [];
-      perfGroupDataForce =  this.selectedAd().groups.filter((item: any)=> item.group != 'Overall').map((group: any)=>{
-        return {
-          title:  this.selectedAd().title,
-          engagement: group.emotionTimelineForcedExposure?.overall.emotion.engagement,
-          completion: group.emotionTimelineForcedExposure?.completion
-        };
-      });
-      this.groupPerformanceForceData.set(perfGroupDataForce)
+    perfGroupData = this.selectedAd().groups.filter((item: any) => item.group != 'Overall').map((group: any) => {
+      console.log(group);
+
+      return {
+        title: this.selectedAd().title,
+        engagement: group.emotionTimelineFirstExposure.overall.emotion.engagement,
+        completion: group.emotionTimelineFirstExposure.completion
+      };
+    });
+    console.log(perfGroupData);
+    this.groupPerformanceFirstData.set(perfGroupData);
+
+    let perfGroupDataForce = [];
+    perfGroupDataForce = this.selectedAd().groups.filter((item: any) => item.group != 'Overall').map((group: any) => {
+      return {
+        title: this.selectedAd().title,
+        engagement: group.emotionTimelineForcedExposure?.overall.emotion.engagement,
+        completion: group.emotionTimelineForcedExposure?.completion
+      };
+    });
+    this.groupPerformanceForceData.set(perfGroupDataForce)
   }
 
   setAd(ad: any) {
@@ -117,7 +118,7 @@ export class Analytics {
         ? 'emotionTimelineFirstExposure'
         : 'emotionTimelineForcedExposure';
 
-        let participants = []
+    let participants = []
 
     participants = group[exposureKey]?.participant || [];
 
@@ -144,12 +145,8 @@ export class Analytics {
 
       if (response.error) return;
 
-      // 🔥 normalize data
       response.data = response.data.map((item: any) => {
-
         item.groups = item.groups.map((groupItem: any) => {
-
-          // First Exposure
           groupItem.emotionTimelineFirstExposure.participant = [
             {
               cnt_id: item.cnt_id,
@@ -159,8 +156,6 @@ export class Analytics {
             },
             ...groupItem.emotionTimelineFirstExposure.participant
           ];
-
-          // Forced Exposure
           if (groupItem.emotionTimelineForcedExposure) {
             groupItem.emotionTimelineForcedExposure.participant = [
               {
@@ -173,50 +168,49 @@ export class Analytics {
               ...groupItem.emotionTimelineForcedExposure.participant
             ];
           }
-
           return groupItem;
         });
 
         return item;
       });
 
-      this.response = response;
+      this.response.set(response);
 
-      // 🔥 init
       this.ads.set(response.data);
-      this.setAd(this.ads()[0]);
+      if (this.ads()[0].groups.length > 0) {
+        this.setAd(this.ads()[0]);
+        const perf = response.data.map((ad: any) => {
+          const d = ad.groups[0].emotionTimelineFirstExposure;
+          return {
+            title: ad.title,
+            engagement: d.overall.emotion.engagement,
+            completion: d.completion
+          };
+        });
 
-      // performance
-      const perf = response.data.map((ad: any) => {
-        const d = ad.groups[0].emotionTimelineFirstExposure;
-        return {
-          title: ad.title,
-          engagement: d.overall.emotion.engagement,
-          completion: d.completion
-        };
-      });
+        //console.log(perf);
+        this.PerformanceData.set(perf);
 
-      //console.log(perf);
-      this.PerformanceData.set(perf);
+        const perfGroupData = response.data[0].groups.filter((item: any) => item.group != 'Overall').map((group: any) => {
+          return {
+            title: response.data[0].title,
+            engagement: group.emotionTimelineFirstExposure.overall.emotion.engagement,
+            completion: group.emotionTimelineFirstExposure.completion
+          };
+        });
+        console.log(perfGroupData);
+        this.groupPerformanceFirstData.set(perfGroupData);
 
-      const perfGroupData = response.data[0].groups.filter((item: any)=> item.group != 'Overall').map((group: any)=>{
-        return {
-          title: response.data[0].title,
-          engagement: group.emotionTimelineFirstExposure.overall.emotion.engagement,
-          completion: group.emotionTimelineFirstExposure.completion
-        };
-      });
-      console.log(perfGroupData);
-      this.groupPerformanceFirstData.set(perfGroupData);
-
-            const perfGroupDataForce = response.data[0].groups.filter((item: any)=> item.group != 'Overall').map((group: any)=>{
-        return {
-          title: response.data[0].title,
-          engagement: group.emotionTimelineForcedExposure.overall.emotion.engagement,
-          completion: group.emotionTimelineForcedExposure.completion
-        };
-      });
-      this.groupPerformanceForceData.set(perfGroupDataForce);
+        const perfGroupDataForce = response.data[0].groups.filter((item: any) => item.group != 'Overall').map((group: any) => {
+          return {
+            title: response.data[0].title,
+            engagement: group.emotionTimelineForcedExposure.overall.emotion.engagement,
+            completion: group.emotionTimelineForcedExposure.completion
+          };
+        });
+        this.groupPerformanceForceData.set(perfGroupDataForce);
+      }
     });
+    this.loading.set(false);
   }
 }

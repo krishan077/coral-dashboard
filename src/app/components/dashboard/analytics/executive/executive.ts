@@ -9,6 +9,8 @@ import {
 
 import * as Highcharts from 'highcharts';
 import { ViewerRetention } from '../viewer-retention/viewer-retention';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-executive',
@@ -16,6 +18,7 @@ import { ViewerRetention } from '../viewer-retention/viewer-retention';
   styleUrl: './executive.css',
   imports: [ViewerRetention]
 })
+
 export class Executive implements OnChanges, AfterViewInit {
 
   @Input() ads: any;
@@ -31,6 +34,8 @@ export class Executive implements OnChanges, AfterViewInit {
     currentTime: number;
   }>();
 
+  environment = environment;
+
   emotionLegends = [
     { name: 'Happy', color: '#22c55e', visible: false },
     { name: 'Angry', color: '#dc2626', visible: false },
@@ -44,7 +49,9 @@ export class Executive implements OnChanges, AfterViewInit {
 
   downloadingScenes = signal<Record<string, boolean>>({});
 
-  ngAfterViewInit(): void {
+  constructor(private http: HttpClient) { }
+
+  async ngAfterViewInit(): Promise<void> {
     this.initCharts();
   }
 
@@ -53,10 +60,19 @@ export class Executive implements OnChanges, AfterViewInit {
     if (changes['ads'] && this.ads) {
 
       setTimeout(() => {
+
         this.initCharts();
+
       });
+
     }
+
   }
+
+
+  // ==========================================
+  // CHARTS
+  // ==========================================
 
   initCharts() {
 
@@ -77,6 +93,7 @@ export class Executive implements OnChanges, AfterViewInit {
       ad.duration = 0;
 
       ad.isPlaying = false;
+
       ad['showGraph'] = true;
 
       const chart = Highcharts.chart(`emotion-chart-${index}`, {
@@ -308,6 +325,7 @@ export class Executive implements OnChanges, AfterViewInit {
       (current / duration) * 100;
 
     if (video.ended) {
+
       ad.isPlaying = false;
     }
   }
@@ -337,13 +355,11 @@ export class Executive implements OnChanges, AfterViewInit {
 
     if (!previewVideo) return;
 
-    // SAVE MAIN VIDEO STATE
     this.pausedStates.set(mainVideo, {
       wasPlaying: !mainVideo.paused,
       currentTime: mainVideo.currentTime
     });
 
-    // PAUSE MAIN VIDEO
     mainVideo.pause();
 
     ad.isPlaying = false;
@@ -354,10 +370,10 @@ export class Executive implements OnChanges, AfterViewInit {
 
     this.clearTimer(previewVideo);
 
-    // PAUSE OTHER PREVIEW VIDEOS
     document.querySelectorAll('video').forEach(v => {
 
       if (v !== previewVideo && v !== mainVideo) {
+
         v.pause();
       }
     });
@@ -393,12 +409,10 @@ export class Executive implements OnChanges, AfterViewInit {
 
     if (!previewVideo) return;
 
-    // STOP PREVIEW
     previewVideo.pause();
 
     this.clearTimer(previewVideo);
 
-    // RESTORE MAIN VIDEO
     const state = this.pausedStates.get(mainVideo);
 
     if (state) {
@@ -441,150 +455,121 @@ export class Executive implements OnChanges, AfterViewInit {
   }
 
   getRoundedValue(value: number) {
+
     return Number(value?.toFixed(2)) || 0;
   }
 
   toggleGraph(ad: any, index: number) {
 
-  ad.showGraph = !ad.showGraph;
+    ad.showGraph = !ad.showGraph;
 
-  setTimeout(() => {
+    setTimeout(() => {
 
-    const chart = this.charts[index];
+      const chart = this.charts[index];
 
-    if (chart) {
-      chart.reflow();
-    }
+      if (chart) {
 
-  });
-}
+        chart.reflow();
+      }
 
-isSceneDownloading(key: string): boolean {
-  return this.downloadingScenes()[key] || false;
-}
-
-setSceneDownloading(
-  key: string,
-  value: boolean
-) {
-
-  this.downloadingScenes.update(current => ({
-    ...current,
-    [key]: value
-  }));
-}
-
-async downloadScene(
-  videoUrl: string,
-  sceneTime: number,
-  title: string,
-  sceneKey: string
-) {
-  this.setSceneDownloading(sceneKey, true);
-  const start = Math.max(sceneTime - 3, 0);
-
-  const end = sceneTime + 3;
-
-  // CREATE VIDEO
-  const video = document.createElement('video');
-
-  video.src = videoUrl;
-
-  video.crossOrigin = 'anonymous';
-
-  video.muted = true;
-
-  await video.play().catch(() => { });
-
-  video.pause();
-
-  // WAIT FOR METADATA
-  await new Promise<void>((resolve) => {
-
-    if (video.readyState >= 1) {
-      resolve();
-    } else {
-      video.onloadedmetadata = () => resolve();
-    }
-
-  });
-
-  // CREATE CANVAS
-  const canvas = document.createElement('canvas');
-
-  canvas.width = video.videoWidth;
-
-  canvas.height = video.videoHeight;
-
-  const ctx = canvas.getContext('2d');
-
-  if (!ctx) return;
-
-  // RECORD STREAM
-  const stream = canvas.captureStream(30);
-
-  const recorder = new MediaRecorder(stream, {
-    mimeType: 'video/webm'
-  });
-
-  const chunks: Blob[] = [];
-
-  recorder.ondataavailable = (e) => {
-
-    if (e.data.size > 0) {
-      chunks.push(e.data);
-    }
-
-  };
-
-  recorder.start();
-
-  // SEEK TO START
-  video.currentTime = start;
-
-  await new Promise(resolve => {
-
-    video.onseeked = () => resolve(true);
-
-  });
-
-  video.play();
-
-  // DRAW LOOP
-  const render = () => {
-
-    if (video.currentTime >= end || video.paused || video.ended) {
-
-      recorder.stop();
-
-      video.pause();
-
-      return;
-    }
-
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    requestAnimationFrame(render);
-
-  };
-
-  render();
-
-  // DOWNLOAD FILE
-  recorder.onstop = () => {
-
-    const blob = new Blob(chunks, {
-      type: 'video/webm'
     });
+  }
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download =
-      `${title.replace(/\s+/g, '_')}_${start}s-${end}s.webm`;
-    a.click();
-    URL.revokeObjectURL(url);
-    this.setSceneDownloading(sceneKey, false);
-  };
+  isSceneDownloading(key: string): boolean {
+
+    return this.downloadingScenes()[key] || false;
+  }
+
+  setSceneDownloading(
+    key: string,
+    value: boolean
+  ) {
+
+    this.downloadingScenes.update(current => ({
+      ...current,
+      [key]: value
+    }));
+  }
+
+  // ==========================================
+  // NEW MP4 DOWNLOAD FUNCTION
+  // ==========================================
+
+  async downloadScene(
+    videoUrl: string,
+    sceneTime: number,
+    title: string,
+    sceneKey: string
+  ) {
+    this.setSceneDownloading(sceneKey, true);
+    let params = {
+      "videoUrl": videoUrl,
+      "startTime": Math.max(sceneTime - 3, 0),
+      "endTime": sceneTime + 3
+    };
+
+    this.http.post(
+    `${this.environment.apiUrl}download-video-clip`,
+    params,
+    {
+      responseType: 'blob', // important
+      observe: 'response'
+    } 
+  ).subscribe({
+    next: (response) => {
+      const blob = response.body;
+
+      if (!blob) {
+        console.error('No blob received');
+        return;
+      }
+
+      let fileName = `${title}_(${params.startTime}_${params.endTime}).mp4`;
+
+      const contentDisposition = response.headers.get('Content-Disposition');
+
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?([^"]+)"?/);
+
+        if (match?.[1]) {
+          fileName = match[1];
+        }
+      }
+
+      const downloadUrl = window.URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(downloadUrl);
+        this.setSceneDownloading(sceneKey, false);
+    },
+
+    error: async (error) => {
+      console.error('Download failed:', error);
+
+      // Backend JSON error also comes as Blob because responseType is blob
+      if (error.error instanceof Blob) {
+        const errorText = await error.error.text();
+
+        try {
+          const errorJson = JSON.parse(errorText);
+          alert(errorJson.message || 'Download failed');
+        } catch {
+          alert(errorText || 'Download failed');
+        }
+
+        return;
+      }
+
+      alert('Download failed');
+        this.setSceneDownloading(sceneKey, false);
+
+    }
+  });
 }
 }

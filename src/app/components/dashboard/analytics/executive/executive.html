@@ -1,3 +1,4 @@
+@if(ads[0].groups.length > 0){
 <div class="bg-white border border-neutral-200 p-5 mt-8">
     <h2 class="text-md font-semibold mb-4">
         Viewer Retentions
@@ -6,6 +7,7 @@
         <app-viewer-retention [data]="ads"></app-viewer-retention>
     </div>
 </div>
+}
 <div class="mt-8">
     @if (ads) {
     @for (ad of ads; track ad; let i = $index) {
@@ -28,15 +30,18 @@
                         class="absolute top-0 left-0 w-full h-full z-20 pointer-events-none"
                         [style.visibility]="ad.showGraph ? 'visible' : 'hidden'">
                     </div>
+
+                @if(ad.groups.length > 0){
                     <!-- PLAYHEAD -->
                     <div class="absolute top-[18%] h-[220px] w-[2px] bg-red-500 z-30"
                         [style.left.%]="ad.playheadPosition" [style.visibility]="ad.showGraph ? 'visible' : 'hidden'">
                     </div>
+                }
                     <!-- CENTER PLAY -->
                     @if (!ad.isPlaying) {
                     <div class="absolute inset-0 flex items-center justify-center z-40">
                         <button
-                            class="bg-white/20 backdrop-blur-md text-white rounded-full w-16 h-16 text-2xl hover:bg-white/30 transition-all"
+                            class="bg-white/20 backdrop-blur-md text-white cursor-pointer rounded-full w-16 h-16 text-2xl hover:bg-white/30 transition-all"
                             (click)="toggleVideo(mainVideo, ad)">
                             ▶
                         </button>
@@ -64,6 +69,7 @@
                             </span>
                         </div>
                         <!-- TOGGLE GRAPH -->
+                         @if(ad.groups.length > 0){
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-sm font-medium text-neutral-700">
                                 Emotion Graph
@@ -78,6 +84,7 @@
                                 </span>
                             </button>
                         </div>
+                    }
                         <!-- SPEED -->
                         <select class="border border-gray-300 rounded-md px-2 py-1 text-sm"
                             (change)="changePlaybackSpeed($event, mainVideo)">
@@ -90,6 +97,7 @@
                         </select>
                     </div>
                     <!-- CUSTOM LEGENDS -->
+                     @if(ad.groups.length > 0){
                     <div class="flex flex-wrap gap-2 mt-4" [style.visibility]="ad.showGraph ? 'visible' : 'hidden'">
                         @for (legend of emotionLegends; track legend.name) {
                         <button class="px-3 py-1 rounded-full border text-xs transition-all"
@@ -101,6 +109,7 @@
                         </button>
                         }
                     </div>
+                }
                 </div>
             </div>
             <!-- SCENES -->
@@ -110,6 +119,7 @@
                     <h2 class="text-sm font-semibold text-neutral-900 mb-3">
                         Top scenes
                     </h2>
+                    @if(ad.groups.length > 0){
                     <div class="grid grid-cols-3 gap-4">
                         @for (
                         scene of ad.groups
@@ -159,12 +169,26 @@
                         }
                         }
                     </div>
+                    }@else {
+                                    <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
+                    <path
+                        d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+                    <path d="M12 15h.01" />
+                    <path d="M12 7v4" />
+                </svg>
+                <p class="text-xs">Scenes are visible when at least one participant has completed the exposure</p>
+            </div>
+                    }
                 </div>
                 <!-- BOTTOM SCENES -->
                 <div>
                     <h2 class="text-sm font-semibold text-neutral-900 mb-3">
                         Bottom scenes
                     </h2>
+                    @if(ad.groups.length > 0){
                     <div class="grid grid-cols-3 gap-4">
                         @for (
                         scene of ad.groups
@@ -214,6 +238,19 @@
                         }
                         }
                     </div>
+                }@else {
+                                    <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
+                    <path
+                        d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+                    <path d="M12 15h.01" />
+                    <path d="M12 7v4" />
+                </svg>
+                <p class="text-xs">Scenes are visible when at least one participant has completed the exposure</p>
+            </div>
+                    }
                 </div>
             </div>
         </div>
