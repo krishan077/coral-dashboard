@@ -34,6 +34,8 @@ export class Executive implements OnChanges, AfterViewInit {
     currentTime: number;
   }>();
 
+  groups: any = signal([]);
+
   environment = environment;
 
   emotionLegends = [
@@ -49,6 +51,8 @@ export class Executive implements OnChanges, AfterViewInit {
 
   downloadingScenes = signal<Record<string, boolean>>({});
 
+  selectedGroup: any = signal(0);
+
   constructor(private http: HttpClient) { }
 
   async ngAfterViewInit(): Promise<void> {
@@ -56,45 +60,48 @@ export class Executive implements OnChanges, AfterViewInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-
     if (changes['ads'] && this.ads) {
-
+      console.log(this.ads);
+      this.groups.set(this.ads[0]?.groups || []);
       setTimeout(() => {
-
         this.initCharts();
-
       });
-
     }
-
   }
 
+  getSelectedGroup(event: any) {
+    this.selectedGroup.set(event.target.value);
+    console.log(this.selectedGroup());
+    this.updateCharts();
+  }
 
-  // ==========================================
-  // CHARTS
-  // ==========================================
+   getEmotionData(ad: any) {
 
-  initCharts() {
+    const selectedGroup =
+      ad.groups?.[this.selectedGroup()];
+
+    return selectedGroup
+      ?.emotionTimelineFirstExposure
+      ?.overall
+      ?.perSecond || [];
+  }
+
+initCharts() {
 
     if (!this.ads) return;
 
     this.ads.forEach((ad: any, index: number) => {
 
-      const emotionData =
-        ad.groups
-          ?.find((x: any) => x.group === 'Overall')
-          ?.emotionTimelineFirstExposure?.overall
-          ?.perSecond || [];
+      const emotionData = this.getEmotionData(ad);
 
       ad.playheadPosition = 0;
-
       ad.currentTime = 0;
-
       ad.duration = 0;
-
       ad.isPlaying = false;
 
-      ad['showGraph'] = true;
+      if (ad.showGraph === undefined) {
+        ad.showGraph = true;
+      }
 
       const chart = Highcharts.chart(`emotion-chart-${index}`, {
 
@@ -118,15 +125,12 @@ export class Executive implements OnChanges, AfterViewInit {
         },
 
         xAxis: {
-
           categories: emotionData.map(
             (x: any) => `${x.time}s`
           ),
 
           gridLineWidth: 0,
-
           lineColor: '#777',
-
           tickColor: '#777',
 
           labels: {
@@ -158,9 +162,7 @@ export class Executive implements OnChanges, AfterViewInit {
         },
 
         plotOptions: {
-
           spline: {
-
             lineWidth: 3,
 
             marker: {
@@ -179,61 +181,98 @@ export class Executive implements OnChanges, AfterViewInit {
           }
         },
 
-        series: [
-          {
-            name: 'Happy',
-            data: emotionData.map((d: any) => this.getRoundedValue(d.happy)),
-            visible: false,
-            color: '#22c55e'
-          },
-          {
-            name: 'Angry',
-            data: emotionData.map((d: any) => this.getRoundedValue(d.angry)),
-            visible: false,
-            color: '#dc2626'
-          },
-          {
-            name: 'Surprised',
-            data: emotionData.map((d: any) => this.getRoundedValue(d.surprised)),
-            visible: false,
-            color: '#f59e0b'
-          },
-          {
-            name: 'Sad',
-            data: emotionData.map((d: any) => this.getRoundedValue(d.sad)),
-            visible: false,
-            color: '#2563eb'
-          },
-          {
-            name: 'Disgusted',
-            data: emotionData.map((d: any) => this.getRoundedValue(d.disgust)),
-            visible: false,
-            color: '#7c3aed'
-          },
-          {
-            name: 'Valence',
-            data: emotionData.map((d: any) => this.getRoundedValue(d.scaledValence)),
-            visible: true,
-            color: '#06b6d4'
-          },
-          {
-            name: 'Arousal',
-            data: emotionData.map((d: any) => this.getRoundedValue(d.scaledArousal)),
-            visible: false,
-            color: '#f97316'
-          },
-          {
-            name: 'Engagement',
-            data: emotionData.map((d: any) => this.getRoundedValue(d.engagement)),
-            visible: false,
-            color: '#e11d48'
-          }
-        ]
+        series: this.getSeriesData(emotionData)
 
       } as any);
 
       this.charts[index] = chart;
     });
+  }
+
+  updateCharts() {
+
+    this.ads.forEach((ad: any, index: number) => {
+
+      const chart = this.charts[index];
+
+      if (!chart) return;
+
+      const emotionData = this.getEmotionData(ad);
+
+      chart.xAxis[0].setCategories(
+        emotionData.map((x: any) => `${x.time}s`),
+        false
+      );
+
+      const updatedSeries = this.getSeriesData(emotionData);
+
+      updatedSeries.forEach((series: any, seriesIndex: number) => {
+
+        if (chart.series[seriesIndex]) {
+
+          chart.series[seriesIndex].setData(
+            series.data,
+            false
+          );
+        }
+      });
+
+      chart.redraw();
+    });
+  }
+
+getSeriesData(emotionData: any[]) {
+
+    return [
+      {
+        name: 'Happy',
+        data: emotionData.map((d: any) => this.getRoundedValue(d.happy)),
+        visible: false,
+        color: '#22c55e'
+      },
+      {
+        name: 'Angry',
+        data: emotionData.map((d: any) => this.getRoundedValue(d.angry)),
+        visible: false,
+        color: '#dc2626'
+      },
+      {
+        name: 'Surprised',
+        data: emotionData.map((d: any) => this.getRoundedValue(d.surprised)),
+        visible: false,
+        color: '#f59e0b'
+      },
+      {
+        name: 'Sad',
+        data: emotionData.map((d: any) => this.getRoundedValue(d.sad)),
+        visible: false,
+        color: '#2563eb'
+      },
+      {
+        name: 'Disgusted',
+        data: emotionData.map((d: any) => this.getRoundedValue(d.disgust)),
+        visible: false,
+        color: '#7c3aed'
+      },
+      {
+        name: 'Valence',
+        data: emotionData.map((d: any) => this.getRoundedValue(d.scaledValence)),
+        visible: true,
+        color: '#06b6d4'
+      },
+      {
+        name: 'Arousal',
+        data: emotionData.map((d: any) => this.getRoundedValue(d.scaledArousal)),
+        visible: false,
+        color: '#f97316'
+      },
+      {
+        name: 'Engagement',
+        data: emotionData.map((d: any) => this.getRoundedValue(d.engagement)),
+        visible: false,
+        color: '#e11d48'
+      }
+    ];
   }
 
   toggleSeries(chartIndex: number, seriesName: string) {
@@ -259,7 +298,7 @@ export class Executive implements OnChanges, AfterViewInit {
     }
   }
 
-  toggleVideo(video: HTMLVideoElement, ad: any) {
+ toggleVideo(video: HTMLVideoElement, ad: any) {
 
     if (video.paused) {
 
@@ -275,69 +314,41 @@ export class Executive implements OnChanges, AfterViewInit {
     }
   }
 
-  seekVideo(
-    event: Event,
-    video: HTMLVideoElement,
-    ad: any
-  ) {
 
+  seekVideo(event: Event, video: HTMLVideoElement, ad: any) {
     const value = +(event.target as HTMLInputElement).value;
-
     video.currentTime = value;
-
     ad.currentTime = value;
   }
 
-  changePlaybackSpeed(
-    event: Event,
-    video: HTMLVideoElement
-  ) {
-
+  changePlaybackSpeed(event: Event, video: HTMLVideoElement) {
     const speed = +(event.target as HTMLSelectElement).value;
-
     video.playbackRate = speed;
   }
 
   onVideoLoaded(video: HTMLVideoElement, adIndex: number) {
-
     this.ads[adIndex].duration = video.duration;
-
     this.ads[adIndex].currentTime = 0;
-
     this.ads[adIndex].isPlaying = false;
   }
 
   onVideoTimeUpdate(event: Event, adIndex: number) {
-
     const video = event.target as HTMLVideoElement;
-
     const duration = video.duration || 1;
-
     const current = video.currentTime;
-
     const ad = this.ads[adIndex];
-
     ad.currentTime = current;
-
     ad.duration = duration;
-
-    ad.playheadPosition =
-      (current / duration) * 100;
-
+    ad.playheadPosition = (current / duration) * 100;
     if (video.ended) {
-
       ad.isPlaying = false;
     }
   }
 
   formatTime(seconds: number): string {
-
     if (!seconds) return '0:00';
-
     const mins = Math.floor(seconds / 60);
-
     const secs = Math.floor(seconds % 60);
-
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
@@ -459,7 +470,7 @@ export class Executive implements OnChanges, AfterViewInit {
     return Number(value?.toFixed(2)) || 0;
   }
 
-  toggleGraph(ad: any, index: number) {
+ toggleGraph(ad: any, index: number) {
 
     ad.showGraph = !ad.showGraph;
 
@@ -490,10 +501,6 @@ export class Executive implements OnChanges, AfterViewInit {
       [key]: value
     }));
   }
-
-  // ==========================================
-  // NEW MP4 DOWNLOAD FUNCTION
-  // ==========================================
 
   async downloadScene(
     videoUrl: string,

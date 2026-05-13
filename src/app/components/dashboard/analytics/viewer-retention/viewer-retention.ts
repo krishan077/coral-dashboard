@@ -20,6 +20,8 @@ export class ViewerRetention implements AfterViewInit, OnChanges {
 
   @Input() data: any;
 
+  @Input() selectedGroup: number = 0;
+
   @ViewChild('chartContainer', { static: false })
   chartContainer!: ElementRef;
 
@@ -37,43 +39,58 @@ export class ViewerRetention implements AfterViewInit, OnChanges {
 
     this.chartReady = true;
 
-    // create chart after DOM ready
     if (this.viewRetentionData.length) {
+
       this.createReactionChart();
     }
   }
 
   // ---------------------------
-  // INPUT CHANGES
+  // ON CHANGES
   // ---------------------------
 
   ngOnChanges(changes: SimpleChanges): void {
 
-    if (changes['data'] && this.data) {
+    if (
+      (changes['data'] || changes['selectedGroup'])
+      && this.data
+    ) {
 
-      console.log('RAW DATA => ', this.data);
+      this.mapRetentionData();
 
-      // map incoming data
-      this.viewRetentionData = this.data.map((item: any) => ({
-
-        // use item.name OR item.title depending on API
-        name: item.name || item.title,
-
-        data:
-          item.groups
-            ?.find((groupItem: any) => groupItem.group === 'Overall')
-            ?.emotionTimelineFirstExposure
-            ?.viewRetention || []
-
-      }));
-
-      console.log('MAPPED DATA => ', this.viewRetentionData);
-
-      // create/update chart only if view ready
       if (this.chartReady) {
+
         this.createReactionChart();
       }
     }
+  }
+
+  // ---------------------------
+  // MAP DATA
+  // ---------------------------
+
+  mapRetentionData(): void {
+
+    this.viewRetentionData = this.data.map((item: any) => {
+
+      const selectedGroupData =
+        item.groups?.[this.selectedGroup];
+
+      return {
+
+        name: item.name || item.title,
+
+        data:
+          selectedGroupData
+            ?.emotionTimelineFirstExposure
+            ?.viewRetention || []
+      };
+    });
+
+    console.log(
+      'UPDATED RETENTION DATA => ',
+      this.viewRetentionData
+    );
   }
 
   // ---------------------------
@@ -85,105 +102,117 @@ export class ViewerRetention implements AfterViewInit, OnChanges {
     if (!this.viewRetentionData?.length) return;
 
     // destroy old chart
+
     if (this.viewerRetentionChart) {
+
       this.viewerRetentionChart.destroy();
     }
 
-    // convert into Highcharts series
-    const seriesData: any[] = this.viewRetentionData.map((item: any) => ({
+    // convert to highcharts series
 
-      type: 'spline',
+    const seriesData: any[] =
+      this.viewRetentionData.map((item: any) => ({
 
-      name: item.name,
-      marker: {enabled: false},
+        type: 'spline',
 
-      data: item.data.map((d: any) => ({
-        x: d.time,
-        y: d.percentage
-      }))
+        name: item.name,
 
-    }));
+        marker: {
+          enabled: false
+        },
+
+        data: item.data.map((d: any) => ({
+          x: d.time,
+          y: d.percentage
+        }))
+      }));
 
     console.log('SERIES DATA => ', seriesData);
 
     // create chart
-    this.viewerRetentionChart = HighCharts.chart(
-      this.chartContainer.nativeElement,
-      {
 
-        chart: {
-          type: 'spline',
-          height: 400
-        },
+    this.viewerRetentionChart =
+      HighCharts.chart(
+        this.chartContainer.nativeElement,
+        {
 
-        title: {
-          text: ''
-        },
-
-        xAxis: {
-
-          title: {
-            text: 'Time (seconds)'
+          chart: {
+            type: 'spline',
+            height: 400
           },
 
-          allowDecimals: false
-        },
-
-        yAxis: {
-
           title: {
-            text: 'Retention %'
+            text: ''
           },
 
-          max: 100,
+          xAxis: {
 
-          labels: {
-            formatter: function (this: any): string {
-              return this.value + '%';
+            title: {
+              text: 'Time (seconds)'
+            },
+
+            allowDecimals: false
+          },
+
+          yAxis: {
+
+            title: {
+              text: 'Retention %'
+            },
+
+            max: 100,
+
+            labels: {
+
+              formatter: function (this: any): string {
+
+                return this.value + '%';
+              }
             }
-          }
-        },
+          },
 
-        legend: {
-          enabled: true
-        },
+          legend: {
+            enabled: true
+          },
 
-        credits: {
-          enabled: false
-        },
+          credits: {
+            enabled: false
+          },
 
-plotOptions: {
-  spline: {
+          plotOptions: {
 
-    lineWidth: 2,
+            spline: {
 
-    marker: {
-      enabled: false
-    },
+              lineWidth: 2,
 
-    states: {
-      hover: {
-        lineWidth: 4
-      }
-    }
-  }
-},
+              marker: {
+                enabled: false
+              },
 
-        tooltip: {
+              states: {
 
-          formatter: function (this: any): string {
+                hover: {
+                  lineWidth: 4
+                }
+              }
+            }
+          },
 
-            return `
-              <b>${this.series.name}</b><br/>
-              <b>Time:</b> ${this.x}s<br/>
-              <b>Retention:</b> ${this.y}%
-            `;
-          }
-        },
+          tooltip: {
 
-        series: seriesData
+            formatter: function (this: any): string {
 
-      } as any
-    );
+              return `
+                <b>${this.series.name}</b><br/>
+                <b>Time:</b> ${this.x}s<br/>
+                <b>Retention:</b> ${this.y}%
+              `;
+            }
+          },
+
+          series: seriesData
+
+        } as any
+      );
   }
 }

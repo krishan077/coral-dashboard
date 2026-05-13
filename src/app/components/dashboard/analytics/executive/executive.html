@@ -1,10 +1,22 @@
 @if(ads[0].groups.length > 0){
+<div class="bg-white border-b border-neutral-200">
+    <div class="px-8 py-4 flex items-center gap-6">
+        <div class="flex items-center gap-2"><span class="text-sm font-medium text-neutral-700">Group:</span>
+            <select class="px-3 py-1.5 border border-neutral-300 rounded text-sm bg-white"
+                (change)="getSelectedGroup($event)">
+                @for(group of groups(); track group){
+                <option [value]="$index">{{group.group}}</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
 <div class="bg-white border border-neutral-200 p-5 mt-8">
     <h2 class="text-md font-semibold mb-4">
         Viewer Retentions
     </h2>
     <div class="w-full">
-        <app-viewer-retention [data]="ads"></app-viewer-retention>
+        <app-viewer-retention [data]="ads" [selectedGroup]="selectedGroup()"></app-viewer-retention>
     </div>
 </div>
 }
@@ -31,12 +43,12 @@
                         [style.visibility]="ad.showGraph ? 'visible' : 'hidden'">
                     </div>
 
-                @if(ad.groups.length > 0){
+                    @if(ad.groups.length > 0){
                     <!-- PLAYHEAD -->
                     <div class="absolute top-[18%] h-[220px] w-[2px] bg-red-500 z-30"
                         [style.left.%]="ad.playheadPosition" [style.visibility]="ad.showGraph ? 'visible' : 'hidden'">
                     </div>
-                }
+                    }
                     <!-- CENTER PLAY -->
                     @if (!ad.isPlaying) {
                     <div class="absolute inset-0 flex items-center justify-center z-40">
@@ -69,7 +81,7 @@
                             </span>
                         </div>
                         <!-- TOGGLE GRAPH -->
-                         @if(ad.groups.length > 0){
+                        @if(ad.groups.length > 0){
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-sm font-medium text-neutral-700">
                                 Emotion Graph
@@ -84,7 +96,7 @@
                                 </span>
                             </button>
                         </div>
-                    }
+                        }
                         <!-- SPEED -->
                         <select class="border border-gray-300 rounded-md px-2 py-1 text-sm"
                             (change)="changePlaybackSpeed($event, mainVideo)">
@@ -97,7 +109,7 @@
                         </select>
                     </div>
                     <!-- CUSTOM LEGENDS -->
-                     @if(ad.groups.length > 0){
+                    @if(ad.groups.length > 0){
                     <div class="flex flex-wrap gap-2 mt-4" [style.visibility]="ad.showGraph ? 'visible' : 'hidden'">
                         @for (legend of emotionLegends; track legend.name) {
                         <button class="px-3 py-1 rounded-full border text-xs transition-all"
@@ -109,7 +121,7 @@
                         </button>
                         }
                     </div>
-                }
+                    }
                 </div>
             </div>
             <!-- SCENES -->
@@ -122,9 +134,7 @@
                     @if(ad.groups.length > 0){
                     <div class="grid grid-cols-3 gap-4">
                         @for (
-                        scene of ad.groups
-                        .filter(item => item.group == 'Overall')[0]
-                        .emotionTimelineFirstExposure.salientScenes;
+                        scene of ad.groups?.[selectedGroup()].emotionTimelineFirstExposure.salientScenes;
                         track scene
                         ) {
                         @if (scene.positive) {
@@ -139,7 +149,8 @@
                                     ((+scene.time + 3))+'s'}}</p>
                                     <button
                                         class="absolute right-2 bottom-2 bg-white/20 backdrop-blur-md text-white text-[11px] px-2 py-1 rounded-md hover:bg-white/30 cursor-pointer"
-                                       [disabled]="isSceneDownloading(ad.title + '-' + scene.time)"  (click)="downloadScene( ad.video_URL, scene.time, ad.title, ad.title + '-' + scene.time)">
+                                        [disabled]="isSceneDownloading(ad.title + '-' + scene.time)"
+                                        (click)="downloadScene( ad.video_URL, scene.time, ad.title, ad.title + '-' + scene.time)">
                                         @if(isSceneDownloading(ad.title + '-' + scene.time)){
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -155,7 +166,7 @@
                                             <path d="m4.9 4.9 2.9 2.9" />
                                         </svg>
                                         }@else {
-                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
                                             class="lucide lucide-download-icon lucide-download">
@@ -170,17 +181,18 @@
                         }
                     </div>
                     }@else {
-                                    <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
-                    <path
-                        d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
-                    <path d="M12 15h.01" />
-                    <path d="M12 7v4" />
-                </svg>
-                <p class="text-xs">Scenes are visible when at least one participant has completed the exposure</p>
-            </div>
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
+                            <path
+                                d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+                            <path d="M12 15h.01" />
+                            <path d="M12 7v4" />
+                        </svg>
+                        <p class="text-xs">Scenes are visible when at least one participant has completed the exposure
+                        </p>
+                    </div>
                     }
                 </div>
                 <!-- BOTTOM SCENES -->
@@ -191,8 +203,7 @@
                     @if(ad.groups.length > 0){
                     <div class="grid grid-cols-3 gap-4">
                         @for (
-                        scene of ad.groups
-                        .filter(item => item.group == 'Overall')[0]
+                        scene of ad.groups?.[selectedGroup()]
                         .emotionTimelineFirstExposure.salientScenes;
                         track scene
                         ) {
@@ -208,7 +219,8 @@
                                     ((+scene.time + 3))+'s'}}</p>
                                     <button
                                         class="absolute right-2 bottom-2 bg-white/20 backdrop-blur-md text-white text-[11px] px-2 py-1 rounded-md hover:bg-white/30 cursor-pointer"
-                                       [disabled]="isSceneDownloading(ad.title + '-' + scene.time)"  (click)="downloadScene( ad.video_URL, scene.time, ad.title, ad.title + '-' + scene.time)">
+                                        [disabled]="isSceneDownloading(ad.title + '-' + scene.time)"
+                                        (click)="downloadScene( ad.video_URL, scene.time, ad.title, ad.title + '-' + scene.time)">
                                         @if(isSceneDownloading(ad.title + '-' + scene.time)){
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -224,7 +236,7 @@
                                             <path d="m4.9 4.9 2.9 2.9" />
                                         </svg>
                                         }@else {
-                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
                                             class="lucide lucide-download-icon lucide-download">
@@ -238,18 +250,19 @@
                         }
                         }
                     </div>
-                }@else {
-                                    <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
-                    <path
-                        d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
-                    <path d="M12 15h.01" />
-                    <path d="M12 7v4" />
-                </svg>
-                <p class="text-xs">Scenes are visible when at least one participant has completed the exposure</p>
-            </div>
+                    }@else {
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-message-square-warning-icon lucide-message-square-warning text-yellow-400">
+                            <path
+                                d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+                            <path d="M12 15h.01" />
+                            <path d="M12 7v4" />
+                        </svg>
+                        <p class="text-xs">Scenes are visible when at least one participant has completed the exposure
+                        </p>
+                    </div>
                     }
                 </div>
             </div>
