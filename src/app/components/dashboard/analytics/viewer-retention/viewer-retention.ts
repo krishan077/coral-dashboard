@@ -9,6 +9,9 @@ import {
 } from '@angular/core';
 
 import * as HighCharts from 'highcharts';
+import 'highcharts/modules/exporting';
+import 'highcharts/modules/export-data';
+import 'highcharts/modules/offline-exporting';
 
 @Component({
   selector: 'app-viewer-retention',
@@ -138,7 +141,8 @@ export class ViewerRetention implements AfterViewInit, OnChanges {
 
           chart: {
             type: 'spline',
-            height: 400
+            height: 400,
+            marginTop: 40
           },
 
           title: {
@@ -210,7 +214,10 @@ export class ViewerRetention implements AfterViewInit, OnChanges {
             }
           },
 
-          series: seriesData
+          series: seriesData,
+          exporting: {
+            enabled: true
+          }
 
         } as any
       );

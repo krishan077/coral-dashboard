@@ -24,7 +24,9 @@ export class GroupPerfromanceBarchart implements OnChanges {
   createChart(){
     this.options = {
     chart: {
-        type: 'column'
+        type: 'column',
+            marginTop: 40
+
     },
     title: {
        text: ''

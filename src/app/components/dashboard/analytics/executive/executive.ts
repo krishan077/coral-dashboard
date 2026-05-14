@@ -181,7 +181,10 @@ initCharts() {
           }
         },
 
-        series: this.getSeriesData(emotionData)
+        series: this.getSeriesData(emotionData),
+        exporting: {
+          enabled: false,
+        }
 
       } as any);
 

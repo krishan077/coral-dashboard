@@ -134,7 +134,8 @@ export class PerSecondChart {
                 visible: s.visible,
                 data: s.data, // ✅ show full data initially
                 marker: { enabled: false }
-            }))
+            })),
+            exporting: { enabled: false }
         };
 
         setTimeout(() => {

@@ -29,7 +29,8 @@ export class AverageEmotionDistribution {
     this.chart = Highcharts.chart('emotion-distribution', {
       chart: {
         polar: true,  
-        type: 'area'
+        type: 'area',
+            marginTop: 40
       },
 
       title: {

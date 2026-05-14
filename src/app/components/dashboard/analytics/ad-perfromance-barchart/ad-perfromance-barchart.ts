@@ -26,7 +26,7 @@ export class AdPerfromanceBarchart implements OnChanges {
     const completionData = this.performanceData.map((item: any) => Math.round(item.completion));
 
     const options: Highcharts.Options = {
-      chart: { type: 'column' },
+      chart: { type: 'column', marginTop: 40 },
       title: { text: '' },
       xAxis: { categories },
       yAxis: { min: 0, title: { text: '' } },
