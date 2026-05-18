@@ -126,7 +126,7 @@ export class PerSecondChart {
                         fontSize: '12px'
                     }
                 },
-                gridLineColor: '#444' // optional for better visibility
+                gridLineWidth: 0,
             },
 
             legend: { enabled: false },

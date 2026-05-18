@@ -93,6 +93,7 @@ export class EmotionTimeline {
                 title: {
                     text: 'Intensity'
                 },
+                gridLineWidth: 0,
             },
 
             legend: {
