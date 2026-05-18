@@ -1,6 +1,8 @@
 <div class="chart-wrapper">
-    <div id="emotion-timeline" class="h-[50%] w-full absolute bottom-0"></div>
-
+    <div id="emotion-timeline" class="h-[50%] w-full absolute bottom-0" style="pointer-events: all; z-index: 5;"></div>
+<!-- <div id="emotion-timeline" class="h-[50%] w-full absolute bottom-0"
+       style="pointer-events: all; position: relative; z-index: 5;"> -->
+  <!-- </div> -->
     @if(videoUrl && showScenes) {
     <div class="overlay">
         @for (scene of salientScenesData; track $index) {

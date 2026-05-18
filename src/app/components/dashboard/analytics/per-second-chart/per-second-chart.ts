@@ -89,7 +89,10 @@ export class PerSecondChart {
                 type: 'spline',
                 backgroundColor: 'transparent',
                 margin: [10, 10, 40, 40],
-                spacing: [0, 0, 0, 0]
+                spacing: [0, 0, 0, 0],
+                 style: {
+      zIndex: 1
+    }
             },
 
             title: {
@@ -135,7 +138,7 @@ export class PerSecondChart {
                 data: s.data, // ✅ show full data initially
                 marker: { enabled: false }
             })),
-            exporting: { enabled: false }
+            exporting: { enabled: true }
         };
 
         setTimeout(() => {

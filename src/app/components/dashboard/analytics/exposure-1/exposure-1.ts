@@ -1,12 +1,13 @@
-import { Component, Input, signal, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, Input, signal, SimpleChanges, ViewChild } from '@angular/core';
 import { GroupPerfromanceBarchart } from '../group-perfromance-barchart/group-perfromance-barchart';
 import { AdPerfromanceBarchart } from '../ad-perfromance-barchart/ad-perfromance-barchart';
 import { EmotionTimeline } from '../emotion-timeline/emotion-timeline';
 import { ViewerRetention } from '../viewer-retention/viewer-retention';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-exposure-1',
-  imports: [ GroupPerfromanceBarchart, AdPerfromanceBarchart, EmotionTimeline, ViewerRetention],
+  imports: [GroupPerfromanceBarchart, AdPerfromanceBarchart, EmotionTimeline, ViewerRetention, CommonModule],
   templateUrl: './exposure-1.html',
   styleUrl: './exposure-1.css',
 })
@@ -18,8 +19,11 @@ export class Exposure1 {
   @Input() videoUrl: any
   @Input() cnt_id: any
   @Input() groupPerformanceFirstData: any
+    isPlaying = false;
+      isMuted = false;
 
-
+ @ViewChild('videoRef') videoRef!: ElementRef<HTMLVideoElement>;
+@ViewChild('userVideo') userVideo!: ElementRef<HTMLVideoElement>;
   topStats: any = signal([
     {
       title: 'Avg Engagement',
@@ -67,10 +71,11 @@ export class Exposure1 {
   ]);
 
   showScenes: any = signal(false);
+  progress: any = signal(0);
 
   ngOnChanges(changes: SimpleChanges): void {
     ////console.log(this.performanceData);
-    //console.log(this.data);
+    console.log(this.data);
     //console.log(this.selectedParticipant);
     
     if(changes['data'] && this.data && this.selectedParticipant){
@@ -117,5 +122,62 @@ export class Exposure1 {
   toggleScenes() {
     this.showScenes.set(!this.showScenes())
   }
+
+  seek(event: any) {
+  const value = event.target.value;
+  const main = this.videoRef.nativeElement;
+  const user = this.userVideo?.nativeElement;
+
+  const time = (value / 100) * main.duration;
+
+  main.currentTime = time;
+  if(user){
+    user.currentTime = time;
+  }
+}
+
+  downloadVideo(videoUrl: string) {
+    console.log('Downloading video from URL:', videoUrl);
+    fetch(videoUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'video.mp4';
+        a.click();
+        window.URL.revokeObjectURL(blobUrl);
+      })
+      .catch(error => {
+        console.error('Download failed:', error);
+      });
+  }
+
+    togglePlay() {
+  const main = this.videoRef.nativeElement;
+  const user = this.userVideo?.nativeElement;
+
+  if (main.paused) {
+    main.play();
+    if(user){
+    user.currentTime = main.currentTime; // sync before play
+    user.play();
+    }
+
+    this.isPlaying = true;
+  } else {
+    main.pause();
+    if(user){
+      user.pause();
+    }
+    this.isPlaying = false;
+  }
+}
+
+toggleMute() {
+  const main = this.videoRef.nativeElement;
+  main.muted = !main.muted;
+  this.isMuted = main.muted;
+}
 
 }

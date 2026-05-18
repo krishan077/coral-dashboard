@@ -73,7 +73,8 @@ export class EmotionTimeline {
         this.options = {
             chart: {
                 type: 'spline',
-            marginTop: 40
+            marginTop: 40,
+            backgroundColor: 'transparent',
 
             },
 
