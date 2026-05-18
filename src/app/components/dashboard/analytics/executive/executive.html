@@ -37,6 +37,18 @@
                         (timeupdate)="onVideoTimeUpdate($event, i)" (loadedmetadata)="onVideoLoaded(mainVideo, i)"
                         (ended)="ad.isPlaying = false">
                     </video>
+                    <button
+                        class="absolute top-3 right-3 z-40 bg-white/20 backdrop-blur-md text-white px-3 py-2 rounded-lg text-sm hover:bg-white/30 transition-all"
+                        (click)="downloadVideo(ad.video_URL)">
+                    
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-download-icon lucide-download">
+                            <path d="M12 15V3" />
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <path d="m7 10 5 5 5-5" />
+                        </svg>
+                    </button>
                     <!-- CHART -->
                     <div [id]="'emotion-chart-' + i"
                         class="absolute top-0 left-0 w-full h-full z-20 pointer-events-none"
