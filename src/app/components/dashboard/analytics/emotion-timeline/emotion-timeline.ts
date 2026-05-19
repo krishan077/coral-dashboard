@@ -14,6 +14,7 @@ export class EmotionTimeline {
     @Input() selectedParticipant: any;
     @Input() showScenes: boolean = false;
     @Input() videoUrl: any;
+    @Input() video: any;
     emotionChart: any;
     options: any;
     hoveredScene: any = null;
@@ -21,16 +22,26 @@ export class EmotionTimeline {
     hoveredIndex: number | null = null;
     activeVideo: HTMLVideoElement | null = null;
     sceneSummaries: { [key: number]: string } = {};
-    emotionEmojiMap: any = {
-        happy: '😊',
-        surprise: '😲',
-        surprised: '😲',
-        angry: '😡',
-        sad: '😢',
-        disgust: '🤢',
-        disgusted: '🤢',
-        neutral: '😐'
-    };
+    // emotionEmojiMap: any = {
+    //     happy: '😊',
+    //     surprise: '😲',
+    //     surprised: '😲',
+    //     angry: '😡',
+    //     sad: '😢',
+    //     disgust: '🤢',
+    //     disgusted: '🤢',
+    //     neutral: '😐'
+    // };
+      emotionEmojiMap: any = {
+      happy: 'assets/emotions/happy.svg',
+      surprise: 'assets/emotions/surprise.svg',
+      //surprised: 'assets/emotions/surprise.svg',
+      angry: 'assets/emotions/angry.svg',
+      sad: 'assets/emotions/sad.svg',
+      disgust: 'assets/emotions/disgust.svg',
+     // disgusted: 'assets/emotions/disgust.svg',
+      neutral: '😐' // Kept as text
+  };
     emotiontimelineData: any;
     salientScenesData: any;
     expandScene: any = signal(false);
@@ -257,8 +268,16 @@ export class EmotionTimeline {
         return scene?.tags?.[0] || 'neutral';
     }
 
-    getEmotionEmoji(scene: any): string {
-        const emotion = this.getDominantEmotion(scene);
-        return this.emotionEmojiMap[emotion] || '😐';
-    }
+    // getEmotionEmoji(scene: any): string {
+    //     const emotion = this.getDominantEmotion(scene);
+    //     return this.emotionEmojiMap[emotion] || '😐';
+    // }
+       getEmotionEmoji(scene: any): string {
+      const emotion = this.getDominantEmotion(scene);
+      return this.emotionEmojiMap[emotion] || '😐';
+  }
+
+    isEmojiAsset(scene: any): boolean {
+      return this.getEmotionEmoji(scene).includes('.svg');
+  }
 }

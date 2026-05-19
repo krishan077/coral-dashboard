@@ -11,15 +11,20 @@
             (mouseenter)="playScene($event, scene.time, $index)" (mouseleave)="stopScene($event)">
             <div class="bubble"
                 [ngStyle]="{background: scene.positive == 1 ? ' rgba(0, 255, 0, 0.25)' : 'rgba(255, 0, 0, 0.25)'}">
-                <video [src]="videoUrl" playsinline class="clip" [muted]="true"
+                <video [src]="videoUrl" playsinline class="clip" [muted]="true" [currentTime]="scene.time"
                     (loadedmetadata)="onVideoLoad($event, scene.time)"></video>
                 <div class="absolute top-2 right-2 text-white">({{ scene.time }}s)</div>
-                <div class="absolute top-2 left-2 text-lg  emoji">
-                    {{ getEmotionEmoji(scene) }}
-                </div>
+             <div class="absolute top-2 left-2 text-lg emoji flex items-center justify-center">
+   <!-- {{ getEmotionEmoji(scene) }} -->
+                @if (isEmojiAsset(scene)) {
+        <img [src]="getEmotionEmoji(scene)" alt="emotion" class="w-6 h-6 object-contain" />
+    } @else {
+        <span>{{ getEmotionEmoji(scene) }}</span>
+    }
+</div>
                 <div class="bg-white mt-1 rounded-sm p-1">
                     <div class="flex items-center justify-between cursor-pointer" (click)="expandScene.set(!expandScene())">
-                        <p>Discreption</p>
+                        <p>Description</p>
                         @if(expandScene()){
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up-icon lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>
                         }

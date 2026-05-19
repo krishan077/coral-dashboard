@@ -21,7 +21,7 @@ export class Analytics {
   groups = signal<any[]>([]);
   participants = signal<any[]>([]);
 
-  selectedExposure = signal(3);
+  selectedExposure = signal(0);
   selectedAd = signal<any>(null);
   selectedGroup = signal<any>(null);
   selectedParticipant = signal<any>(null);

@@ -277,7 +277,7 @@
                                             password?</a>
                                     </div>
                                     <div style="opacity: 1; transform: none;">
-                                        <button type="submit" [disabled]="!loginForm?.valid"
+                                       <button type="submit" [disabled]="loginForm.invalid"
                                             class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg"
                                             (click)="onSubmit()">
                                             Sign In</button>

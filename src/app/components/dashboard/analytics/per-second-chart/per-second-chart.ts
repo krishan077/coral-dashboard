@@ -26,16 +26,36 @@ export class PerSecondChart {
 
 
     sceneSummaries: { [key: number]: string } = {};
-    emotionEmojiMap: any = {
-        happy: '😊',
-        surprise: '😲',
-        surprised: '😲',
-        angry: '😡',
-        sad: '😢',
-        disgust: '🤢',
-        disgusted: '🤢',
-        neutral: '😐'
-    };
+    // emotionEmojiMap: any = {
+    //     happy: '😊',
+    //     surprise: '😲',
+    //     surprised: '😲',
+    //     angry: '😡',
+    //     sad: '😢',
+    //     disgust: '🤢',
+    //     disgusted: '🤢',
+    //     neutral: '😐'
+    // };
+    // Update your mapping to use the asset paths
+  emotionEmojiMap: any = {
+      happy: 'assets/emotions/happy.svg',
+      surprise: 'assets/emotions/surprise.svg',
+      //surprised: 'assets/emotions/surprise.svg',
+      angry: 'assets/emotions/angry.svg',
+      sad: 'assets/emotions/sad.svg',
+      disgust: 'assets/emotions/disgust.svg',
+     // disgusted: 'assets/emotions/disgust.svg',
+      neutral: '😐' // Kept as text
+  };
+
+  // ... existing code ...
+
+ 
+
+  // Add this new helper method to determine how to render the emoji
+  isEmojiAsset(scene: any): boolean {
+      return this.getEmotionEmoji(scene).includes('.svg');
+  }
     salientScenesData: any;
     emotiontimelineData: any;
     isPlayingMode: boolean = false;
@@ -181,6 +201,7 @@ export class PerSecondChart {
     }
 
     playScene(event: any, time: number, index: number) {
+        console.log('Playing scene at time:', time);
 
         const video = event.currentTarget.querySelector('video') as HTMLVideoElement;
         if (this.activeVideo && this.activeVideo !== video) {
@@ -274,8 +295,13 @@ export class PerSecondChart {
         return scene?.tags?.[0] || 'neutral';
     }
 
-    getEmotionEmoji(scene: any): string {
-        const emotion = this.getDominantEmotion(scene);
-        return this.emotionEmojiMap[emotion] || '😐';
-    }
+     getEmotionEmoji(scene: any): string {
+      const emotion = this.getDominantEmotion(scene);
+      return this.emotionEmojiMap[emotion] || '😐';
+  }
+
+    // getEmotionEmoji(scene: any): string {
+    //     const emotion = this.getDominantEmotion(scene);
+    //     return this.emotionEmojiMap[emotion] || '😐';
+    // }
 }
