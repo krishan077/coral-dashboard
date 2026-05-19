@@ -22,7 +22,7 @@ export class Exposure1 {
     isPlaying = false;
       isMuted = false;
 
- @ViewChild('videoRef') videoRef!: ElementRef<HTMLVideoElement>;
+@ViewChild('videoRef') videoRef!: ElementRef<HTMLVideoElement>;;
 @ViewChild('userVideo') userVideo!: ElementRef<HTMLVideoElement>;
   topStats: any = signal([
     {
@@ -178,6 +178,18 @@ toggleMute() {
   const main = this.videoRef.nativeElement;
   main.muted = !main.muted;
   this.isMuted = main.muted;
+}
+  // onVideoLoaded(video: HTMLVideoElement) {
+  //   if (this.chartComp) {
+  //     this.chartComp.initChart(video.duration);
+  //   }
+  // }
+  onTimeUpdate() {
+  const main = this.videoRef.nativeElement;
+  this.progress.set((main.currentTime / main.duration) * 100);
+  if(main.currentTime == main.duration){
+    this.isPlaying = false;
+  }
 }
 
 }

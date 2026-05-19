@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, SimpleChanges, signal } from '@angular/core';
+import { Component, Input, SimpleChanges, signal,ElementRef,ViewChild } from '@angular/core';
 import * as HighCharts from 'highcharts';
 import { HttpClient } from '@angular/common/http';
 
@@ -10,11 +10,16 @@ import { HttpClient } from '@angular/common/http';
     styleUrl: './emotion-timeline.css',
 })
 export class EmotionTimeline {
+    fullSeriesData: any[] = [];
+isPlayingMode: boolean = false;
+emotiontimelineData: any;
+salientScenesData: any;
     @Input() data: any;
     @Input() selectedParticipant: any;
     @Input() showScenes: boolean = false;
     @Input() videoUrl: any;
-    @Input() video: any;
+   @Input() video?: HTMLVideoElement;
+   previewMode = true;
     emotionChart: any;
     options: any;
     hoveredScene: any = null;
@@ -42,11 +47,11 @@ export class EmotionTimeline {
      // disgusted: 'assets/emotions/disgust.svg',
       neutral: '😐' // Kept as text
   };
-    emotiontimelineData: any;
-    salientScenesData: any;
+
     expandScene: any = signal(false);
     @Input() cnt_id: any;
     videoDuration: any = signal(0)
+    videoInitialized = false;
 
 
     constructor(private http: HttpClient) { }
@@ -67,119 +72,282 @@ export class EmotionTimeline {
             this.emotiontimelineData = this.selectedParticipant.persecond || this.selectedParticipant.perSecond;
             //console.log(this.emotiontimelineData);
 
-            this.createReactionChart();
+        const duration =
+    this.video?.duration ||
+    Math.max(...this.emotiontimelineData.map((d: any) => d.time));
+
+this.createReactionChart(duration);
         }
     }
+    ngAfterViewInit() {
 
-    createReactionChart() {
+    if (!this.video) return;
 
-        if (!this.emotiontimelineData || !this.emotiontimelineData.length) return;
+this.video.onplay = () => {
 
-        if (this.emotionChart) {
-            this.emotionChart.destroy();
-        }
+    if (!this.emotionChart) return;
 
-        const time = this.emotiontimelineData.map((d: any) => d.time);
+    this.isPlayingMode = true;
 
-        this.options = {
-            chart: {
-                type: 'spline',
-            marginTop: 40,
-            backgroundColor: 'transparent',
+    this.lastIndex = -1;
 
-            },
+    this.emotionChart.series.forEach((series: any) => {
+        series.setData([], false);
+    });
 
-            title: {
-                text: ''
-            },
+    this.emotionChart.redraw();
+};
 
-            xAxis: {
-                categories: time,
-                title: {
-                    text: 'Time (seconds)'
-                }
-            },
+this.video.onended = () => {
 
-            yAxis: {
-                title: {
-                    text: 'Intensity'
-                },
-                gridLineWidth: 0,
-            },
+    this.isPlayingMode = false;
 
-            legend: {
-                layout: 'horizontal',
-                align: 'center',
-                verticalAlign: 'bottom'
-            },
+    this.previewMode = true;
 
-            credits: {
-                enabled: false
-            },
+    this.lastIndex = -1;
 
-            series: [
-                {
-                    name: 'Happy',
-                    data: this.emotiontimelineData.map((d: any) => this.getRoundedValue(d.happy)),
-                    marker: { enabled: false },
-                    visible: false,
-                    color: '#22c55e' // bright green
-                },
-                {
-                    name: 'Angry',
-                    data: this.emotiontimelineData.map((d: any) => this.getRoundedValue(d.angry)),
-                    marker: { enabled: false },
-                    visible: false,
-                    color: '#dc2626' // strong red
-                },
-                {
-                    name: 'Surprised',
-                    data: this.emotiontimelineData.map((d: any) => this.getRoundedValue(d.surprised)),
-                    marker: { enabled: false },
-                    visible: false,
-                    color: '#f59e0b' // amber
-                },
-                {
-                    name: 'Sad',
-                    data: this.emotiontimelineData.map((d: any) => this.getRoundedValue(d.sad)),
-                    marker: { enabled: false },
-                    visible: false,
-                    color: '#2563eb' // deep blue
-                },
-                {
-                    name: 'Disgusted',
-                    data: this.emotiontimelineData.map((d: any) => this.getRoundedValue(d.disgust)),
-                    marker: { enabled: false },
-                    visible: false,
-                    color: '#7c3aed' // violet
-                },
-                {
-                    name: 'Valence',
-                    data: this.emotiontimelineData.map((d: any) => this.getRoundedValue(d.scaledValence)),
-                    marker: { enabled: false },
-                    visible: true,
-                    color: '#06b6d4' // cyan
-                },
-                {
-                    name: 'Arousal',
-                    data: this.emotiontimelineData.map((d: any) => this.getRoundedValue(d.scaledArousal)),
-                    marker: { enabled: false },
-                    visible: false,
-                    color: '#f97316' // orange (changed from pink)
-                },
-                {
-                    name: 'Engagement',
-                    data: this.emotiontimelineData.map((d: any) => this.getRoundedValue(d.engagement)),
-                    marker: { enabled: false },
-                    visible: false,
-                    color: '#e11d48' // rose (distinct from angry)
-                }
-            ]
+    this.video!.currentTime = 0;
+
+    this.renderFullChart();
+};
+
+this.video.onpause = () => {
+    this.isPlayingMode = false;
+};
+}
+ngAfterViewChecked() {
+
+    if (this.video && !this.videoInitialized) {
+
+        this.videoInitialized = true;
+
+        console.log('VIDEO CONNECTED');
+
+        this.syncWithVideo();
+
+    this.video.onplay = () => {
+
+        this.isPlayingMode = true;
+
+        this.previewMode = false;
+
+        this.lastIndex = -1;
+
+        this.clearChart();
+    };
+        this.video.onpause = () => {
+            this.isPlayingMode = false;
         };
-
-
-        this.emotionChart = HighCharts.chart('emotion-timeline', this.options);
     }
+}
+renderFullChart() {
+
+    if (!this.emotionChart) return;
+
+    this.fullSeriesData.forEach((s: any, i: number) => {
+
+        this.emotionChart.series[i].setData(
+            s.data,
+            false
+        );
+
+    });
+
+    this.emotionChart.redraw();
+}
+clearChart() {
+
+    if (!this.emotionChart) return;
+
+    this.emotionChart.series.forEach((series: any) => {
+        series.setData([], false);
+    });
+
+    this.emotionChart.redraw();
+}
+createReactionChart(duration?: number) {
+
+    if (!this.emotiontimelineData?.length) return;
+
+    if (this.emotionChart) {
+        this.emotionChart.destroy();
+        this.emotionChart = null;
+    }
+
+    const chartDuration =
+        duration ||
+        this.video?.duration ||
+        Math.max(...this.emotiontimelineData.map((d: any) => d.time));
+
+    this.fullSeriesData = [
+        {
+            name: 'Happy',
+            color: '#22c55e',
+            visible: false,
+            key: 'happy'
+        },
+        {
+            name: 'Angry',
+            color: '#dc2626',
+            visible: false,
+            key: 'angry'
+        },
+        {
+            name: 'Surprised',
+            color: '#f59e0b',
+            visible: false,
+            key: 'surprised'
+        },
+        {
+            name: 'Sad',
+            color: '#2563eb',
+            visible: false,
+            key: 'sad'
+        },
+        {
+            name: 'Disgusted',
+            color: '#7c3aed',
+            visible: false,
+            key: 'disgust'
+        },
+        {
+            name: 'Valence',
+            color: '#06b6d4',
+            visible: true,
+            key: 'scaledValence'
+        },
+        {
+            name: 'Arousal',
+            color: '#f97316',
+            visible: false,
+            key: 'scaledArousal'
+        },
+        {
+            name: 'Engagement',
+            color: '#e11d48',
+            visible: false,
+            key: 'engagement'
+        }
+    ].map((s: any) => ({
+        ...s,
+        data: this.emotiontimelineData.map((d: any, i: number) => [
+            Number(d.time ?? i),
+            this.getRoundedValue(d[s.key])
+        ])
+    }));
+
+    this.options = {
+        chart: {
+            type: 'spline',
+            backgroundColor: 'transparent',
+            marginTop: 40,
+        },
+
+        title: {
+            text: ''
+        },
+
+        xAxis: {
+            type: 'linear',
+            min: 0,
+            max: chartDuration,
+            title: {
+                text: 'Time (seconds)'
+            }
+        },
+
+        yAxis: {
+            title: {
+                text: 'Intensity'
+            },
+            gridLineWidth: 0,
+        },
+
+        legend: {
+            layout: 'horizontal',
+            align: 'center',
+            verticalAlign: 'bottom'
+        },
+
+        credits: {
+            enabled: false
+        },
+
+        series: this.fullSeriesData.map((s: any) => ({
+            name: s.name,
+            color: s.color,
+            visible: s.visible,
+            data: [],
+            marker: { enabled: false }
+        }))
+    };
+
+setTimeout(() => {
+
+    this.emotionChart = HighCharts.chart(
+        'emotion-timeline',
+        this.options
+    );
+
+    // show full graph initially
+    this.renderFullChart();
+
+    // attach video sync
+    this.syncWithVideo();
+
+}, 0);
+}
+
+lastIndex = -1;
+
+syncWithVideo() {
+
+    if (!this.video) return;
+
+    this.video.ontimeupdate = () => {
+
+        if (
+            !this.video ||
+            !this.emotionChart ||
+            !this.isPlayingMode
+        ) {
+            return;
+        }
+
+        const currentTime = Math.floor(
+            this.video.currentTime
+        );
+
+        if (currentTime === this.lastIndex) {
+            return;
+        }
+
+        this.lastIndex = currentTime;
+
+        this.emotionChart.series.forEach(
+            (series: any, i: number) => {
+
+                const fullData =
+                    this.fullSeriesData[i].data;
+
+                const point = fullData.find(
+                    (d: any) =>
+                        Math.floor(d[0]) === currentTime
+                );
+
+                if (point) {
+                    series.addPoint(
+                        point,
+                        false,
+                        false
+                    );
+                }
+            }
+        );
+
+        this.emotionChart.redraw();
+    };
+}
 
     onVideoLoad(event: any, time: number) {
         const video = event.target as HTMLVideoElement;
@@ -206,7 +374,27 @@ export class EmotionTimeline {
         return point ? this.getRoundedValue(point.happy) : 0; // change to any metric
     }
 
-    getPixelPosition(time: number) {
+// getPixelPosition(time: number) {
+
+//     if (!this.emotionChart) {
+//         return { x: 0, y: 0 };
+//     }
+
+//     const x = this.emotionChart.xAxis[0].toPixels(time, false);
+
+//     const point = this.emotiontimelineData.find(
+//         (d: any) => d.time === time
+//     );
+
+//     const yValue = point
+//         ? this.getRoundedValue(point.scaledValence)
+//         : 0;
+
+//     const y = this.emotionChart.yAxis[0].toPixels(yValue, false);
+
+//     return { x, y };
+// }
+  getPixelPosition(time: number) {
         if (!this.emotionChart) return { x: 0, y: 0 };
 
         const x = this.emotionChart.xAxis[0].toPixels(time, false);

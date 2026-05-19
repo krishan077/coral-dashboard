@@ -103,7 +103,7 @@
                     <div class="bg-black rounded-xl">
                         <div class="relative video-container" style="width: 100%; height: 480px; min-width: 0px;">
                             <video #videoRef class="w-full rounded-xl h-full object-contain" muted
-                                [src]="videoUrl">
+                                [src]="videoUrl"  (timeupdate)="onTimeUpdate()">
                             </video>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                 }
                 <div  [ngClass]="selectedParticipant.wh_mo_id == 'All' ? 'absolute top-0 left-0 w-full h-full' : ''">
                   <app-emotion-timeline [showScenes]="showScenes()" [data]="data" [selectedParticipant]="selectedParticipant"
-            [videoUrl]="videoUrl" [cnt_id]="cnt_id"></app-emotion-timeline>
+            [videoUrl]="videoUrl"  [video]="videoRef?.nativeElement" [cnt_id]="cnt_id"></app-emotion-timeline>
                 </div>
                             
 
