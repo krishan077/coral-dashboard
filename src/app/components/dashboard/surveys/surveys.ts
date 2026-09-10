@@ -25,11 +25,12 @@ export class Surveys {
   liveStudies: any = signal([]);
   CompleteStudies: any = signal([]);
   selectedTab: any = signal('All');
+  coral_user = localStorage.getItem('coral_user') ? JSON.parse(localStorage.getItem('coral_user')!) : null;
+
 
 
   constructor(private router: Router, private _api: Api) {
-    let id = localStorage.getItem('comp_id')
-    this.comp_id = id
+    this.comp_id = this.coral_user?.comp_id;
     this.getStudiesData(this.comp_id);
   }
 

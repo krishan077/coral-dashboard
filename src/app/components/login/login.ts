@@ -28,7 +28,10 @@ export class Login {
       this._api.postDataNodeApi('login', this.loginForm.value).subscribe((response: any)=>{
         if(!response.error){
           this.authService.login(response.data.token);
-          localStorage.setItem('comp_id', response.data.comp_id)
+          const coral_user = {
+            ...response.data,
+          }
+          localStorage.setItem('coral_user', JSON.stringify(coral_user));
           this.router.navigate(['/dashboard']);
         }else{
           ////console.log(response.message);

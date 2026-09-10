@@ -10,9 +10,12 @@ import { Auth } from '../../services/auth';
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
+  coral_user = localStorage.getItem('coral_user') ? JSON.parse(localStorage.getItem('coral_user')!) : null;
 
   collapsed = signal(false);
-  constructor(private _auth: Auth, private _router: Router){}
+  constructor(private _auth: Auth, private _router: Router){
+
+  }
 
   showUserMenu = signal(false);
   

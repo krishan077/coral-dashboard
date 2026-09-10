@@ -11,7 +11,7 @@
             <div class="w-56 bg-white border-r border-gray-200 flex flex-col">
                 <div class="p-4 border-b border-gray-100 flex items-center justify-between">
                     <a class="block active">
-                        <img src="monet-logo.png" alt="Monet RCT" class="h-7 w-auto"></a>
+                        <img src="logo.png" alt="Monet RCT" class="w-auto"></a>
                         <div class="bg-white flex flex-col p-4 cursor-pointer" (click)="collapsed.set(true)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left-icon lucide-chevron-left"><path d="m15 18-6-6 6-6"/></svg>
                 </div>
@@ -43,7 +43,7 @@
                     </a>
                 </nav>
 
-                <div class="p-3 border-t border-gray-100 space-y-0.5">
+                <!-- <div class="p-3 border-t border-gray-100 space-y-0.5">
                     <a
                         class="w-full cursor-pointer flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors text-xs text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -67,15 +67,16 @@
                         </svg>
                         <span>Help Center</span>
                     </a>
-                </div>
+                </div> -->
                 <div class="p-3 border-t border-gray-100">
+
                     <button (click)="showUserMenu.set(!showUserMenu())"
                         class="w-full cursor-pointer flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-gray-50 transition-colors">
                         <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200" alt="Sarah Chen"
                             class="w-6 h-6 rounded-full object-cover">
                         <div class="flex-1 text-left min-w-0">
-                            <div class="text-xs text-gray-900 truncate">User</div>
-                            <div class="text-[10px] text-gray-500 capitalize">pro</div>
+                            <div class="text-xs text-gray-900 truncate">{{coral_user?.comp_name}}</div>
+                            <!-- <div class="text-[10px] text-gray-500 capitalize">pro</div> -->
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -84,7 +85,7 @@
                         </svg>
                     </button>
                     @if(showUserMenu()){
-                    <div class="mt-2 py-1 bg-white border border-gray-200 rounded-lg shadow-lg" bis_skin_checked="1">
+                    <div class="mt-2 py-1 bg-white border border-gray-200 rounded-lg shadow-lg">
                         <!-- <button
                             class="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                             fdprocessedid="80gz29"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -126,6 +127,10 @@
                             </svg>Sign Out</button>
                     </div>
                     }
+                                                                               <a class="block active px-2.5 py-2">
+                        <p class="text-xs text-gray-500">Powered By</p>
+                        <img src="monet-logo.png" alt="Monet" class="h-7 w-auto mt-2">
+                    </a>
                 </div>
             </div>
             }
