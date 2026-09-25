@@ -3,11 +3,14 @@ import { provideRouter, withHashLocation } from '@angular/router';
 import { provideMarkdown } from 'ngx-markdown';
 
 import { routes } from './app.routes';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withHashLocation()),
-    provideMarkdown()
+    provideMarkdown(),
+    provideHttpClient(withInterceptors([authInterceptor]))
   ]
 };
