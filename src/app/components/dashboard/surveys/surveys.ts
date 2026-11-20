@@ -35,7 +35,7 @@ export class Surveys {
   }
 
   viewResult(study: any) {
-    this.router.navigate(['/dashboard/analytics'], { queryParams: { study_id: study.study_id, study_name: study.study_name } });
+    this.router.navigate(['/dashboard/analytics'], { queryParams: { study_id: study.study_id, study_name: study.study_name, study_type: study.study_type } });
   }
 
   getStudiesData(comp_id: number) {

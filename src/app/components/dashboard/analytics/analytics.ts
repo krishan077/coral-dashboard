@@ -35,6 +35,7 @@ export class Analytics {
   response= signal<any>(null);
   study_id: any;
   study_name: any;
+  study_type: any;
   loading = signal(true);
 
   constructor(private route: ActivatedRoute, private _api: Api) {
@@ -42,6 +43,7 @@ export class Analytics {
       if (data.params) {
         this.study_id = data.params.study_id;
         this.study_name = data.params.study_name;
+        this.study_type = data.params.study_type;
         this.getOverallData(this.study_id);
       }
     });
@@ -204,8 +206,8 @@ export class Analytics {
         const perfGroupDataForce = response.data[0].groups.filter((item: any) => item.group != 'Overall').map((group: any) => {
           return {
             title: response.data[0].title,
-            engagement: group.emotionTimelineForcedExposure.overall.emotion.engagement,
-            completion: group.emotionTimelineForcedExposure.completion
+            engagement: group.emotionTimelineForcedExposure?.overall.emotion.engagement,
+            completion: group.emotionTimelineForcedExposure?.completion
           };
         });
         this.groupPerformanceForceData.set(perfGroupDataForce);

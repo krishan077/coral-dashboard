@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-exposure-1',
-  imports: [GroupPerfromanceBarchart, AdPerfromanceBarchart, EmotionTimeline, ViewerRetention, CommonModule],
+  imports: [GroupPerfromanceBarchart, AdPerfromanceBarchart, EmotionTimeline, CommonModule],
   templateUrl: './exposure-1.html',
   styleUrl: './exposure-1.css',
 })
@@ -17,6 +17,7 @@ export class Exposure1 {
   @Input() selectedParticipant: any;
   @Input() performanceData: any;
   @Input() videoUrl: any
+  @Input() imgUrl: any
   @Input() cnt_id: any
   @Input() groupPerformanceFirstData: any
     isPlaying = false;
@@ -72,6 +73,7 @@ export class Exposure1 {
 
   showScenes: any = signal(false);
   progress: any = signal(0);
+  @Input() study_type: any;
 
   ngOnChanges(changes: SimpleChanges): void {
     ////console.log(this.performanceData);

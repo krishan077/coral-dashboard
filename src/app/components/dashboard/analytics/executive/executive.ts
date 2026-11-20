@@ -22,6 +22,7 @@ import { environment } from '../../../../../environments/environment';
 export class Executive implements OnChanges, AfterViewInit {
 
   @Input() ads: any;
+  @Input() study_type: any;
 
   Highcharts: typeof Highcharts = Highcharts;
 

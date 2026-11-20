@@ -30,12 +30,13 @@
                 </svg>
                 }
             </div>
-            <div class="text-3xl font-semibold text-neutral-900">{{stat.value + ($index == 3 ? 's': $index == 0 ? '':  '%')}}</div>
+            <div class="text-3xl font-semibold text-neutral-900">{{stat.value + ($index == 3 ? 's': $index == 0 ? '':
+                '%')}}</div>
             <div class="text-xs text-neutral-500 mt-1">{{stat.description}}</div>
         </div>
         }
         } @else(){
-             @for (stat of topStatsPerParticipant(); track stat.title) {
+        @for (stat of topStatsPerParticipant(); track stat.title) {
         <div class="bg-white border border-neutral-200 p-5">
             <div class="flex items-center justify-between mb-1">
                 <span class="text-sm text-neutral-600">{{stat.title}}</span>
@@ -69,16 +70,13 @@
         }
         }
 
-</div>
-        <!-- <div class="bg-white border border-neutral-200 p-6">
-            <h2 class="text-lg font-semibold text-neutral-900 mb-4">Viewer Retention</h2>
-       <app-viewer-retention [data]="data.viewRetention"></app-viewer-retention>
-    </div> -->
+    </div>
 
     <div class="bg-white border border-neutral-200 p-6">
         <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-neutral-900 mb-4">FACS Emotion Timeline</h2>
-            @if(this.selectedParticipant.wh_mo_id == "All"){
+            @if(study_type === 'video') {
+            @if(this.selectedParticipant.wh_mo_id == "All") {
             <button class="mb-2 px-3 py-1 text-sm bg-gray-200 rounded cursor-pointer" (click)="toggleScenes()">
                 {{ showScenes() ? 'Hide Scenes' : 'Show Scenes' }}
             </button>
@@ -95,41 +93,43 @@
                 <p class="text-xs">Salient scenes are visible only in the overall view</p>
             </div>
             }
+            }
         </div>
 
-                <div [ngClass]="selectedParticipant.wh_mo_id == 'All' ? 'relative' : ''">
-                            @if(selectedParticipant.wh_mo_id == "All"){
-                <div class="w-full">
-                    <div class="bg-black rounded-xl">
-                        <div class="relative video-container" style="width: 100%; height: 480px; min-width: 0px;">
-                            <video #videoRef class="w-full rounded-xl h-full object-contain" muted
-                                [src]="videoUrl"  (timeupdate)="onTimeUpdate()">
-                            </video>
-                        </div>
+        @if(study_type === 'video') {
+        <div [ngClass]="selectedParticipant.wh_mo_id == 'All' ? 'relative' : ''">
+            @if(selectedParticipant.wh_mo_id == "All"){
+            <div class="w-full">
+                <div class="bg-black rounded-xl">
+                    <div class="relative video-container" style="width: 100%; height: 480px; min-width: 0px;">
+                        <video #videoRef class="w-full rounded-xl h-full object-contain" muted [src]="videoUrl"
+                            (timeupdate)="onTimeUpdate()">
+                        </video>
                     </div>
                 </div>
-                }
-                <div  [ngClass]="selectedParticipant.wh_mo_id == 'All' ? 'absolute top-0 left-0 w-full h-full' : ''">
-                  <app-emotion-timeline [showScenes]="showScenes()" [data]="data" [selectedParticipant]="selectedParticipant"
-            [videoUrl]="videoUrl"  [video]="videoRef?.nativeElement" [cnt_id]="cnt_id"></app-emotion-timeline>
-                </div>
-                            
+            </div>
+            }
+            <div [ngClass]="selectedParticipant.wh_mo_id == 'All' ? 'absolute top-0 left-0 w-full h-full' : ''">
+                <app-emotion-timeline [showScenes]="showScenes()" [data]="data"
+                    [selectedParticipant]="selectedParticipant" [videoUrl]="videoUrl" [video]="videoRef?.nativeElement"
+                    [cnt_id]="cnt_id"></app-emotion-timeline>
+            </div>
 
         </div>
         @if(selectedParticipant.wh_mo_id == "All"){
         <div class="mt-30">
-               <input class="w-full mt-2" type="range" [value]="progress()" (input)="seek($event)">
+            <input class="w-full mt-2" type="range" [value]="progress()" (input)="seek($event)">
             <div class="flex items-center justify-center gap-2">
-                        <button class="p-2 rounded-full bg-violet-500 cursor-pointer hover:bg-violet-400"
-                            (click)="downloadVideo(selectedParticipant?.video_URL || videoUrl)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-download-icon lucide-download text-white">
-                                <path d="M12 15V3" />
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <path d="m7 10 5 5 5-5" />
-                            </svg>
-                        </button>
+                <button class="p-2 rounded-full bg-violet-500 cursor-pointer hover:bg-violet-400"
+                    (click)="downloadVideo(selectedParticipant?.video_URL || videoUrl)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-download-icon lucide-download text-white">
+                        <path d="M12 15V3" />
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <path d="m7 10 5 5 5-5" />
+                    </svg>
+                </button>
                 <button class="p-2 rounded-full bg-violet-500 cursor-pointer hover:bg-violet-400"
                     (click)="togglePlay()">
                     @if(!isPlaying){
@@ -178,8 +178,30 @@
                 </button>
             </div>
         </div>
-    }
-   
+        }
+        }@else {
+        <div [ngClass]="selectedParticipant.wh_mo_id == 'All' ? 'relative' : ''">
+            @if(selectedParticipant.wh_mo_id == "All"){
+            <div class="w-full">
+                <div class="bg-black rounded-xl">
+                    <div class="relative video-container" style="width: 100%; height: 480px; min-width: 0px;">
+                        <img [src]="videoUrl" alt="Placeholder Image"
+                            class="w-full rounded-xl h-full object-contain">
+                    </div>
+                </div>
+            </div>
+            }
+            <div [ngClass]="selectedParticipant.wh_mo_id == 'All' ? 'absolute top-0 left-0 w-full h-full' : ''">
+                <app-emotion-timeline [showScenes]="showScenes()" [data]="data"
+                    [selectedParticipant]="selectedParticipant" [videoUrl]="videoUrl" [video]="videoRef?.nativeElement"
+                    [cnt_id]="cnt_id"></app-emotion-timeline>
+            </div>
+            <div class="mt-30">
+
+        </div>
+        </div>
+        }
+
     </div>
 
     <div class="grid grid-cols-2 gap-6">
@@ -189,8 +211,9 @@
         </div>
         <div class="bg-white border border-neutral-200 p-6">
             <h2 class="text-lg font-semibold text-neutral-900 mb-4">Group Performance</h2>
-            <app-group-perfromance-barchart [groupPerformanceFirstData]="groupPerformanceFirstData" ></app-group-perfromance-barchart>
+            <app-group-perfromance-barchart
+                [groupPerformanceFirstData]="groupPerformanceFirstData"></app-group-perfromance-barchart>
         </div>
     </div>
-    
+
 </div>
