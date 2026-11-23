@@ -19,10 +19,10 @@ export class Api {
   }
 
   getDataNodeApi(endpoint: string) {
-    return this.http.get(environment.nodeApiUrl + endpoint);
+    return this.http.get(environment.nodeApiUrl + endpoint,{withCredentials:true});
   }
 
   postDataNodeApi(endpoint: string, params: any){
-    return this.http.post(environment.nodeApiUrl + endpoint, params);
+    return this.http.post(environment.nodeApiUrl + endpoint, params,{withCredentials:true});
   }
 }
