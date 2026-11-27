@@ -2,58 +2,13 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.1.
 
-## Development server
+## Dev Environment
 
-To start a local development server, run:
+### Proxy Config
+This project uses proxy configuration for enabling cookies security. The proxy configuration is updated in angular.json file and you don't need to run any additional command for proxy. You just run the project with ng serve. 
 
-```bash
-ng serve
-```
+### Envionment Setup 
+The environment.development.ts file have 2 entries for backend url. Both are already explained there for local and live backend use as needed you can switch to target backend and just run the project and it will automatically update the proxy configuration for cookies. For now it has port 5 mentioned for running so remember to serve the project over port 4200 in your local environment and if you are using any different port then you need to update the port in environment.development.ts file. 
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Backend Connection
+Also for now the local backend getting connected is having IP for Pankaj Phour laptop so if you're connecting with any other developer's backend then you need to replace the target value inside the proxy.conf.json with the developer's system IP. 
